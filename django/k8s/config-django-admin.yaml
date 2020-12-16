@@ -27,6 +27,7 @@ spec:
       - 'django_json_widget'
       - 'prettyjson'
       - 'django_krules_procevents'
+      - 'device_manager'
     loglevel: "info"
     debug: "False"
   container:
