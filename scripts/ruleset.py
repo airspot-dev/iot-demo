@@ -154,7 +154,7 @@ def cmd_deploy(spec_module, path, namespace, registry):
 
     revision_name = _hashed(spec_module.name, #labels,
                             template_annotations, ksvc_sink, ksvc_procevents_sink, service_account, digest)
-    logger.info(f"revision name: {revision_name}")
+    logger.info(f"Revision name: {revision_name}")
 
     obj_ref = pykube.object_factory(
         api, "serving.knative.dev/v1", "Service"
@@ -223,7 +223,52 @@ def cmd_deploy(spec_module, path, namespace, registry):
         obj_ref.update()
         logger.info(f"Ruleset '{spec_module.name}' updated")
 
+    # Create/Update triggers
+    triggers = getattr(spec_module, "triggers", ())
+    for trigger in triggers:
+        try:
+            obj_ref = pykube.object_factory(
+                api, "eventing.knative.dev/v1", "Trigger"
+            ).objects(api).get_or_none(name=trigger.get("name"))
+            if obj_ref is None:
+                name=trigger.pop('name')
+                logging.debug(f"creating trigger {name}")
+                trigger.update({
+                    "subscriber": {
+                        "ref": {
+                            "apiVersion": "serving.knative.dev/v1",
+                            "kind": "Service",
+                            "name": spec_module.name,
+                            "namespace": namespace,
+                        }
+                    }
+                })
+                obj = {
+                    "apiVersion": "eventing.knative.dev/v1",
+                    "kind": "Trigger",
+                    "metadata": {
+                        "name": name,
+                        "namespace": namespace,
+                        "labels": {
+                            "krules.airspot.dev/owned-by": spec_module.name,
+                        },
+                    },
+                    "spec": trigger,
 
+                }
+                if obj["spec"].get("broker") is None:
+                    obj["spec"]["broker"] = getattr(spec_module, "triggers_default_broker", "default")
+                pykube.object_factory(api, "eventing.knative.dev/v1", "Trigger")(api, obj).create()
+                logger.info(f"Trigger {obj['metadata']['name']} created")
+            else:
+                name = trigger.pop("name")
+                trigger["subscriber"] = obj_ref.obj["spec"]["subscriber"]
+                obj_ref.obj["spec"].update(trigger)
+                obj_ref.update()
+                logger.info(f"Trigger {name} updated")
+        except Exception as ex:
+            logger.error(f"Error processing trigger:\n{trigger}")
+            logger.exception(ex)
 
 def main():
     global logger
