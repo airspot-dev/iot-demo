@@ -65,7 +65,7 @@ def main():
 
         headers, body = m.ToRequest(event, converters.TypeBinary, json.dumps)
 
-        response = requests.post(os.environ.get("DISPATCH_URL"),
+        response = requests.post(os.environ.get("K_SINK"),
                                  headers=headers,
                                  data=body)
 
