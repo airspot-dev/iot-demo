@@ -72,4 +72,4 @@ def main():
         response.raise_for_status()
         return "OK", 200
     else:
-        return "No API_KEY provided", 401
+        return "No valid API_KEY provided", 401
