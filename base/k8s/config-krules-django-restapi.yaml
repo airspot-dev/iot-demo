@@ -7,7 +7,7 @@ spec:
   appliesTo:
     configs.krules.airspot.dev/django-restapi-consumer: inject
   data:
-    url: $RESTAPI_URL
+    url: "http://django-device-admin.iot-demo.gke1.airspot.dev"
     api_key: $RESTAPI_TOKEN
   container:
     envFrom:
