@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.postgres.fields import JSONField
 from prettyjson import PrettyJSONWidget
 
-from .models import Fleet, Device
+from .models import Fleet, Device, ReceivedData
 
 
 @admin.register(Fleet)
@@ -15,4 +15,14 @@ class FleetAdmin(admin.ModelAdmin):
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ["status"]
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget(attrs={"initial": "parsed"})},
+    }
+
+
+@admin.register(ReceivedData)
+class DeviceAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget(attrs={"initial": "parsed"})},
+    }

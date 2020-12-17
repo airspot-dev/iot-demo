@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: django-admin
+  name: django-device-admin
   labels:
      krules.airspot.dev/type: django-admin
 spec:
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: django
-        image: lorenzocampo/django-iot-demo:pre11
+        image: lorenzocampo/django-iot-demo:pre14
 ---
 
 apiVersion: sources.knative.dev/v1alpha2
@@ -27,7 +27,7 @@ spec:
    kind: Deployment
    selector:
      matchLabels:
-       serving.knative.dev/service: django-admin
+       serving.knative.dev/service: django-device-admin
  sink:
    ref:
      apiVersion: eventing.knative.dev/v1
