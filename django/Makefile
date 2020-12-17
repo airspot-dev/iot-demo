@@ -1,5 +1,5 @@
 SHELL=/bin/bash
-TARGET_IMAGE:=lorenzocampo/django-iot-demo:pre14
+TARGET_IMAGE:=lorenzocampo/django-iot-demo:pre15
 NAMESPACE:=iot-demo
 
 

@@ -28,6 +28,7 @@ spec:
       - 'prettyjson'
       - 'django_krules_procevents'
       - 'device_manager'
+      - 'rest_framework.authtoken'
     loglevel: "info"
     debug: "False"
   container:
