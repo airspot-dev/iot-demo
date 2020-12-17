@@ -3,7 +3,7 @@ kind: ConfigurationProvider
 metadata:
   name: config-krules-subjects-redis
 spec:
-  key: subjects_backends.redis
+  key: subjects-backends.redis
   appliesTo:
     krules.airspot.dev/type: ruleset
   data:
