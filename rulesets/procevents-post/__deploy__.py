@@ -1,5 +1,5 @@
 
-name = "metrics-store-django-orm"
+name = "procevents-post"
 
 add_files = (
     "ruleset.py",
