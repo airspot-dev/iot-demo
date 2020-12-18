@@ -35,9 +35,9 @@ subparsers = parser.add_subparsers(dest="action", title="actions")
 create_parser = subparsers.add_parser("create", help="create ruleset skeleton directory")
 
 
-def _ruleset_name_type(arg_value, p=re.compile(r"^[a-z\-]+$")):
+def _ruleset_name_type(arg_value, p=re.compile(r"^[0-9a-z\-]+$")):
     if not p.match(arg_value):
-        raise argparse.ArgumentTypeError("name can contain only lower letters and the '-' character")
+        raise argparse.ArgumentTypeError("name can contain only lower letters, numbers and the '-' character")
     return arg_value
 
 
