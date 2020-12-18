@@ -45,6 +45,9 @@ INSTALLED_APPS = admin_config.get(
       'django.contrib.messages',
       'django.contrib.staticfiles',
       'storages',
+      'django_json_widget',
+      'prettyjson',
+      'django_krules_procevents',
     ]
 )
 # INSTALLED_APPS = [

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: django
-        image: lorenzocampo/django-iot-demo:pre14
+        image: lorenzocampo/django-iot-demo:pre17
 ---
 
 apiVersion: sources.knative.dev/v1alpha2
