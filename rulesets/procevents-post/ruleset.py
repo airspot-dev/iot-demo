@@ -15,6 +15,10 @@ processing = Const.PROCESSING
 from krules_core.providers import proc_events_rx_factory
 from krules_env import RULE_PROC_EVENT
 
+import pprint
+proc_events_rx_factory().subscribe(
+  on_next=pprint.pprint,
+)
 
 rulesdata = [
     """
