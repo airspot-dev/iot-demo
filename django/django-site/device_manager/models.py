@@ -9,6 +9,9 @@ class Fleet(models.Model):
     endpoint = models.URLField(max_length=255, default="")
     status = models.CharField(max_length=255, default="UNKNOWN")
 
+    def __str__(self):
+        return self.name
+
 
 class Device(models.Model):
 
@@ -18,9 +21,15 @@ class Device(models.Model):
     fleet = models.ForeignKey(Fleet, on_delete=models.deletion.CASCADE)
     status = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.id
+
 
 class ReceivedData(models.Model):
 
     device = models.ForeignKey(Device, on_delete=models.deletion.CASCADE)
     data = JSONField()
     timestamp = models.DateTimeField()
+
+    class Meta:
+        verbose_name_plural = "received data"
