@@ -24,17 +24,10 @@ template_annotations = {
 #service_account = "my-service-account"
 
 triggers = (
-#    {
-#        "name": "test-trigger",
-#        # broker: "my-broker"
-#        "filter": {
-#            "attributes": {
-#                "type": "my-type"
-#                # ...
-#            }
-#        }
-#    },
-#    ...
+   {
+       "name": "procevent-post-trigger",
+       "broker": "procevents",
+   },
 )
 triggers_default_broker="default"
 
