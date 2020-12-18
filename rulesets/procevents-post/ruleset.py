@@ -32,7 +32,7 @@ rulesdata = [
                 Process(
                     lambda self:
                         requests.post(
-                            url=self.configs["django"]["restapi"]["url"],
+                            url="%s/procevent/" % self.configs["django"]["restapi"]["url"],
                             headers={"Authentication": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
                             json={
                                     "rule_name": self.payload["name"],
