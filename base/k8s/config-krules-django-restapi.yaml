@@ -13,3 +13,6 @@ spec:
     envFrom:
       - secretRef:
           name: restapi-auth
+    env:
+      - name: TEST_VAR
+        value: "hi there, again and again and again and again and again and again"
