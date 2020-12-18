@@ -1,5 +1,5 @@
 SHELL=/bin/bash
-TARGET_IMAGE:=lorenzocampo/django-iot-demo:pre15
+TARGET_IMAGE:=lorenzocampo/django-iot-demo:pre17
 NAMESPACE:=iot-demo
 
 
@@ -7,7 +7,7 @@ all: build push resources
 
 
 build:
-	docker build -t ${TARGET_IMAGE} .
+	docker build --no-cache -t ${TARGET_IMAGE} .
 
 migrate:
 	docker run --env-file env ${TARGET_IMAGE} sh -c "python manage.py makemigrations && python manage.py migrate"
