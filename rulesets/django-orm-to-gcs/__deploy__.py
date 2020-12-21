@@ -29,7 +29,6 @@ triggers = (
        "name": "django-orm-to-gcs-trigger",
        "filter": {
            "attributes": {
-               "type": "django.orm.post_save",
                "djangoapp": "device_manager",
                "djangomodel": "fleet"
            }
