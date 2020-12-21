@@ -21,12 +21,16 @@ proc_events_rx_factory().subscribe(
 from app_functions import hashed
 from k8s_functions import K8sObjectCreate, K8sObjectsQuery
 
+from ruleset_functions import SetSecretName
+
+IMAGE_DIGEST = 'lorenzocampo/device_endpoint@sha256:99212a0673ee9913d9c9e8f82c5dbb994f2bd54869ae0c1f3b3866ae93af52f0'
+
 rulesdata = [
     """
     On new fleet create secret
     """,
     {
-        rulename: "on-new-fleet-create-secret",
+        rulename: "on-new-fleet-create-service",
         subscribe_to: ["django.orm.post_save"],
         ruledata: {
             filters: [
@@ -36,7 +40,7 @@ rulesdata = [
                 )
             ],
             processing: [
-                SetPayloadProperty("secret_name", lambda payload: hashed(payload["data"]["name"], payload["data"]["api_key"], payload["data"]["name"])),
+                SetSecretName("secret_name"),
                 SetPayloadProperty("labels", lambda payload: (
                     eval(payload.get("data").get("cluster_local")) and {
                         "serving.knative.dev/visibility": "cluster-local"
@@ -77,7 +81,7 @@ rulesdata = [
                             },
                             "spec": {
                                 "containers": [{
-                                    "image": "lorenzocampo/device-endpoint",
+                                    "image": IMAGE_DIGEST,
                                     "env": [
                                         {
                                             "name": "K_SINK",
@@ -100,6 +104,25 @@ rulesdata = [
 
                 })
             ]
+        }
+    },
+    """
+    On fleet update (manage api_key and cluster-local)
+    """,
+    {
+        rulename: "on-update-fleet-update-service",
+        subscribe_to: ["django.orm.post_save"],
+        ruledata: {
+            filters: [
+                Filter(
+                    lambda payload:
+                    not payload.get("signal_kwargs", {}).get("created", False)
+                )
+            ],
+            processing: [
+                # set the expected secret name
+                SetSecretName("secret_name"),
+            ],
         }
     },
 ]
