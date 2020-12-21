@@ -48,6 +48,7 @@ INSTALLED_APPS = admin_config.get(
       'django_json_widget',
       'prettyjson',
       'django_krules_procevents',
+      'rest_framework',
     ]
 )
 # INSTALLED_APPS = [

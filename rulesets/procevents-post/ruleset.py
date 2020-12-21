@@ -15,11 +15,6 @@ processing = Const.PROCESSING
 from krules_core.providers import proc_events_rx_factory
 from krules_env import RULE_PROC_EVENT
 
-import pprint
-proc_events_rx_factory().subscribe(
-  on_next=pprint.pprint,
-)
-
 rulesdata = [
     """
     Post processed events to API
@@ -33,7 +28,7 @@ rulesdata = [
                     lambda self:
                         requests.post(
                             url="%s/procevent/" % self.configs["django"]["restapi"]["url"],
-                            headers={"Authentication": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
+                            headers={"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
                             json={
                                     "rule_name": self.payload["name"],
                                     "type": self.payload["type"],
