@@ -1,3 +1,3 @@
 #!/bin/bash
 
-curl -H {"api_key": "bearer $API_KEY"} --data-binary payload-example.json
+curl $1 -H "authorization: Bearer $2" --data-binary payload-example.json
