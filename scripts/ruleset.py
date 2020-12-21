@@ -151,9 +151,10 @@ def cmd_deploy(spec_module, path, namespace, registry):
     ksvc_procevents_sink = _resolve_broker(api, getattr(spec_module, "ksvc_procevents_sink", "broker:procevents"), namespace)
 
     service_account = getattr(spec_module, "service_account", "")
+    logger.debug(f"service account: {service_account}")
 
     revision_name = _hashed(spec_module.name, #labels,
-                            template_annotations, ksvc_sink, ksvc_procevents_sink, service_account, digest)
+                            template_annotations, ksvc_sink, ksvc_procevents_sink, service_account, digest, service_account)
     logger.info(f"Revision name: {revision_name}")
 
     obj_ref = pykube.object_factory(
@@ -197,7 +198,7 @@ def cmd_deploy(spec_module, path, namespace, registry):
             }
         }
         if service_account != "":
-            obj["spec"]["template"]["space"]["serviceAccountName"] = service_account
+            obj["spec"]["template"]["spec"]["serviceAccountName"] = service_account
 
         pykube.object_factory(api, "serving.knative.dev/v1", "Service")(api, obj).create()
         logger.info(f"Ruleset '{spec_module.name}' created")
@@ -219,6 +220,9 @@ def cmd_deploy(spec_module, path, namespace, registry):
                     env["value"] = ksvc_sink
                 elif env["name"] == "K_PROCEVENTS_SINK":
                     env["value"] = ksvc_procevents_sink
+
+        if service_account != "":
+            obj_ref.obj["spec"]["template"]["spec"]["serviceAccountName"] = service_account
 
         obj_ref.update()
         logger.info(f"Ruleset '{spec_module.name}' updated")
