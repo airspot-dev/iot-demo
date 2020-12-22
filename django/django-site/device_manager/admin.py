@@ -7,7 +7,7 @@ from .models import Fleet, Device, ReceivedData
 
 @admin.register(Fleet)
 class FleetAdmin(admin.ModelAdmin):
-    readonly_fields = ["endpoint"]
+    readonly_fields = ["endpoint", "dashboard"]
     formfield_overrides = {
         JSONField: {'widget': PrettyJSONWidget(attrs={"initial": "parsed"})},
     }

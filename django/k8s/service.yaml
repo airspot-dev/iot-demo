@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: django
-        image: lorenzocampo/django-iot-demo:pre22
+        image: lorenzocampo/django-iot-demo:pre23
 
 ---
 

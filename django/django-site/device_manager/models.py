@@ -7,6 +7,7 @@ class Fleet(models.Model):
     name = models.CharField(max_length=255)
     api_key = models.CharField(max_length=255)
     endpoint = models.URLField(max_length=255, default="")
+    dashboard = models.URLField(max_length=255, default="")
     cluster_local = models.BooleanField(default=False)
 
     def __str__(self):
