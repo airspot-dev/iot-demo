@@ -1,3 +1,3 @@
 #!/bin/bash
 
-curl $1 -H "authorization: Bearer $3" --data-binary $2
+curl $1 -H "authorization: Bearer $3" -H "Content-Type: application/json" -d @$2
