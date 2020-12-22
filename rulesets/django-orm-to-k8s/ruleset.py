@@ -19,7 +19,7 @@ proc_events_rx_factory().subscribe(
 #  on_next=publish_proc_events_errors,
 # )
 from app_functions import hashed
-from k8s_functions import K8sObjectCreate, K8sObjectsQuery
+from k8s_functions import K8sObjectCreate, K8sObjectsQuery, K8sObjectDelete
 
 try:
     from ruleset_functions import *
@@ -46,7 +46,7 @@ endpoint_rulesdata = [
             processing: [
                 SetSecretName("secret_name"),
                 SetClusterLocalLabel("lbl_cluster_local"),
-                Route("ensure-secret"),
+                Route("ensure-apikey-secret"),
                 # fetch broker address
                 K8sObjectsQuery(
                     apiversion="eventing.knative.dev/v1",
@@ -110,7 +110,7 @@ endpoint_rulesdata = [
             processing: [
                 SetSecretName("secret_name"),
                 SetClusterLocalLabel("lbl_cluster_local"),
-                Route("ensure-secret"),
+                Route("ensure-apikey-secret"),
                 UpdateService(
                     secret_name=lambda payload: payload.get("secret_name"),
                     lbl_cluster_local=lambda payload: payload.get("lbl_cluster_local")
@@ -118,6 +118,26 @@ endpoint_rulesdata = [
             ],
         }
     },
+    """
+    On fleet delete
+    """,
+    {
+        rulename: "on-fleet-delete-delete-service",
+        subscribe_to: "django.orm.post_delete",
+        ruledata: {
+            processing: [
+                # delete endpoint
+                K8sObjectDelete(
+                    apiversion="serving.knative.dev/v1", kind="Service",
+                    name=lambda payload: payload["data"]["name"]
+                ),
+                # delete apikey secret
+                CleanUpSecrets(
+                    other_than="-"
+                )
+            ]
+        }
+    }
 ]
 
 secret_rulesdata = [
@@ -128,7 +148,7 @@ secret_rulesdata = [
     """,
     {
         rulename: "ensure-ingestion-apikey-secret",
-        subscribe_to: "ensure-secret",
+        subscribe_to: "ensure-apikey-secret",
         ruledata: {
             filters: [
                 K8sObjectsQuery(

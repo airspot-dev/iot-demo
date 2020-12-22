@@ -29,8 +29,8 @@ class CleanUpSecrets(K8sObjectsQuery):
 
     def execute(self, **kwargs):
 
-        owned_by = kwargs.get("owned_by", self.payload["data"]["name"])
-        other_than = kwargs.get("other_than", self.payload["secret_name"])
+        owned_by = kwargs.get("owned_by", self.payload.get("data").get("name"))
+        other_than = kwargs.get("other_than", self.payload.get("secret_name"))
 
         to_delete = []
 

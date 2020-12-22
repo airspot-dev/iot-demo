@@ -33,6 +33,16 @@ triggers = (
            }
        }
    },
+   {
+       "name": "django-orm-to-k8s-fleet-post-delete",
+       "filter": {
+           "attributes": {
+               "type": "django.orm.post_delete",
+               "djangoapp": "device_manager",
+               "djangomodel": "fleet"
+           }
+       }
+   },
 )
 triggers_default_broker = "default"
 
