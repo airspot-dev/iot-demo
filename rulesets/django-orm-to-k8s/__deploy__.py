@@ -34,7 +34,7 @@ triggers = (
        }
    },
 )
-triggers_default_broker="default"
+triggers_default_broker = "default"
 
 ksvc_sink = "broker:default"
 ksvc_procevents_sink = "broker:procevents"

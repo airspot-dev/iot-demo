@@ -53,6 +53,8 @@ class UpdateService(K8sObjectsQuery):
 
     def _update_obj(self, obj, secret_name, lbl_cluster_local):
         obj.obj["spec"]["template"]["metadata"]["name"] = secret_name
+        if "serving.knative.dev/visibility" in obj.obj["metadata"]["labels"]:
+            del obj.obj["metadata"]["labels"]["serving.knative.dev/visibility"]
         obj.obj["metadata"]["labels"].update(lbl_cluster_local)
         for container in obj.obj["spec"]["template"]["spec"]["containers"]:
             if container["name"] == "user-container":
