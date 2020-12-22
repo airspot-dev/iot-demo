@@ -3,13 +3,35 @@ from k8s_functions import K8sObjectsQuery
 from krules_core.base_functions import SetPayloadProperty
 
 
-class SetSecretName(SetPayloadProperty):
+def kservice(labels, name, revision_name, containers):
+    obj = {
+        "apiVersion": "serving.knative.dev/v1",
+        "kind": "Service",
+        "metadata": {
+            "labels": labels,
+            "name": name,
+        },
+        "spec": {
+            "template": {
+                "metadata": {},
+                "spec": {
+                    "containers": containers,
+                }
+            }
+        }
+    }
+    if name != revision_name:
+        obj["spec"]["template"]["metadata"]["name"] = revision_name
+    return obj
+
+
+class SetEndpointHashedName(SetPayloadProperty):
 
     def execute(self, payload_target, **kwargs):
 
         name = hashed(
             self.payload["data"]["name"],
-            self.payload["data"]["api_key"], self.payload["data"]["name"]
+            self.payload["data"]["api_key"], self.payload["data"]["name"],
         )
         super().execute(payload_target, name)
 
@@ -30,7 +52,7 @@ class CleanUpSecrets(K8sObjectsQuery):
     def execute(self, **kwargs):
 
         owned_by = kwargs.get("owned_by", self.payload.get("data").get("name"))
-        other_than = kwargs.get("other_than", self.payload.get("secret_name"))
+        other_than = kwargs.get("other_than", self.payload.get("hashed_name"))
 
         to_delete = []
 
@@ -49,7 +71,7 @@ class CleanUpSecrets(K8sObjectsQuery):
             obj.delete()
 
 
-class UpdateService(K8sObjectsQuery):
+class UpdateEndpointService(K8sObjectsQuery):
 
     def _update_obj(self, obj, secret_name, lbl_cluster_local):
         obj.obj["spec"]["template"]["metadata"]["name"] = secret_name
@@ -67,7 +89,7 @@ class UpdateService(K8sObjectsQuery):
 
     def execute(self, **kwargs):
 
-        secret_name = kwargs.get("secret_name", self.payload.get("secret_name"))
+        hashed_name = kwargs.get("hashed_name", self.payload.get("hashed_name"))
         lbl_cluster_local = kwargs.get("lbl_cluster_local", self.payload.get("lbl_cluster_local"))
 
         super().execute(
@@ -76,6 +98,33 @@ class UpdateService(K8sObjectsQuery):
                 "demo.krules.airspot.dev/app": "fleet-endpoint"
             },
             returns=lambda qobjs: (
-                self._update_obj(qobjs.get_by_name(self.payload.get("data").get("name")), secret_name, lbl_cluster_local)
+                self._update_obj(qobjs.get_by_name(self.payload.get("data").get("name")), hashed_name, lbl_cluster_local)
+            )
+        )
+
+
+class UpdateDashboardService(K8sObjectsQuery):
+
+    def _update_obj(self, obj, lbl_cluster_local):
+        if "serving.knative.dev/visibility" in obj.obj["metadata"]["labels"]:
+            del obj.obj["metadata"]["labels"]["serving.knative.dev/visibility"]
+        obj.obj["metadata"]["labels"].update(lbl_cluster_local)
+
+        self.payload["_updated_object"] = obj.obj
+        obj.update()
+
+    def execute(self, **kwargs):
+
+        lbl_cluster_local = kwargs.get("lbl_cluster_local", self.payload.get("lbl_cluster_local"))
+
+        super().execute(
+            apiversion="serving.knative.dev/v1", kind="Service",
+            selector={
+                "demo.krules.airspot.dev/app": "fleet-dashboard"
+            },
+            returns=lambda qobjs: (
+                self._update_obj(
+                    qobjs.get_by_name("{}-dashboard".format(self.payload.get("data").get("name"))),
+                                      lbl_cluster_local)
             )
         )
