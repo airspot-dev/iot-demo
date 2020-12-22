@@ -27,14 +27,15 @@ except ImportError:
     # for local development
     from .ruleset_functions import *
 
-IMAGE_DIGEST = 'lorenzocampo/device-endpoint@sha256:99212a0673ee9913d9c9e8f82c5dbb994f2bd54869ae0c1f3b3866ae93af52f0'
+ENDPOINT_IMAGE = 'lorenzocampo/device-endpoint@sha256:99212a0673ee9913d9c9e8f82c5dbb994f2bd54869ae0c1f3b3866ae93af52f0'
+WS_APP_IMAGE = "lorenzocampo/iot-web-app@sha256:9562fea7ba68a088dddd583f7e96bf139a52902b01e910854f75fa577af0c81f"
 
 endpoint_rulesdata = [
     """
-    On new fleet create secret
+    On new fleet create, create endpoint 
     """,
     {
-        rulename: "on-new-fleet-create-service",
+        rulename: "on-new-fleet-create-endpoint-service",
         subscribe_to: ["django.orm.post_save"],
         ruledata: {
             filters: [
@@ -44,7 +45,7 @@ endpoint_rulesdata = [
                 )
             ],
             processing: [
-                SetSecretName("secret_name"),
+                SetEndpointHashedName("hashed_name"),
                 SetClusterLocalLabel("lbl_cluster_local"),
                 Route("ensure-apikey-secret"),
                 # fetch broker address
@@ -55,50 +56,42 @@ endpoint_rulesdata = [
                         payload.setdefault("k_sink", objs.get(name="data-received").obj["status"]["address"]["url"])
                     )
                 ),
-                K8sObjectCreate(lambda payload: {
-                    "apiVersion": "serving.knative.dev/v1",
-                    "kind": "Service",
-                    "metadata": {
-                        "labels": {**{"demo.krules.airspot.dev/app": "fleet-endpoint"}, **payload.get("lbl_cluster_local")},
-                        "name": payload["data"]["name"],
-                    },
-                    "spec": {
-                        "template": {
-                            "metadata": {
-                                "name": payload["secret_name"]
-                            },
-                            "spec": {
-                                "containers": [{
-                                    "image": IMAGE_DIGEST,
-                                    "env": [
-                                        {
-                                            "name": "K_SINK",
-                                            "value": payload["k_sink"],
-                                        },
-                                        {
-                                            "name": "API_KEY",
-                                            "valueFrom": {
-                                                "secretKeyRef": {
-                                                    "name": payload["secret_name"],
-                                                    "key": "api_key"
-                                                }
+                SetPayloadProperty(
+                    "_kservice", lambda payload: kservice(
+                        labels={**{"demo.krules.airspot.dev/app": "fleet-endpoint"}, **payload.get("lbl_cluster_local")},
+                        name=payload["data"]["name"],
+                        revision_name=payload["hashed_name"],
+                        containers=[{
+                                "image": ENDPOINT_IMAGE,
+                                "env": [
+                                    {
+                                        "name": "K_SINK",
+                                        "value": payload["k_sink"],
+                                    },
+                                    {
+                                        "name": "API_KEY",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "name": payload["hashed_name"],
+                                                "key": "api_key"
                                             }
                                         }
-                                    ]
-                                }]
-                            }
-                        }
-                    }
-
-                })
+                                    }
+                                ]
+                            }]
+                    )
+                ),
+                K8sObjectCreate(
+                    lambda payload: payload["_kservice"]
+                ),
             ]
         }
     },
     """
-    On fleet update (manage api_key and cluster-local)
+    On fleet update (manage api_key and cluster-local), update endpoint
     """,
     {
-        rulename: "on-update-fleet-update-service",
+        rulename: "on-update-fleet-update-endpoint-service",
         subscribe_to: ["django.orm.post_save"],
         ruledata: {
             filters: [
@@ -108,21 +101,21 @@ endpoint_rulesdata = [
                 )
             ],
             processing: [
-                SetSecretName("secret_name"),
+                SetEndpointHashedName("hashed_name"),
                 SetClusterLocalLabel("lbl_cluster_local"),
                 Route("ensure-apikey-secret"),
-                UpdateService(
-                    secret_name=lambda payload: payload.get("secret_name"),
+                UpdateEndpointService(
+                    secret_name=lambda payload: payload.get("hashed_name"),
                     lbl_cluster_local=lambda payload: payload.get("lbl_cluster_local")
                 )
             ],
         }
     },
     """
-    On fleet delete
+    On fleet delete, delete endpoint
     """,
     {
-        rulename: "on-fleet-delete-delete-service",
+        rulename: "on-fleet-delete-delete-endpoint-service",
         subscribe_to: "django.orm.post_delete",
         ruledata: {
             processing: [
@@ -155,7 +148,7 @@ secret_rulesdata = [
                     apiversion="v1",
                     kind="Secret",
                     returns=lambda payload: lambda qobjs: (
-                        qobjs.get_or_none(name=payload.get("secret_name")) is None
+                        qobjs.get_or_none(name=payload.get("hashed_name")) is None
                     )
                 )
             ],
@@ -165,7 +158,7 @@ secret_rulesdata = [
                     "kind": "Secret",
                     "type": "Opaque",
                     "metadata": {
-                        "name": payload["secret_name"],
+                        "name": payload["hashed_name"],
                         "labels": {
                             "app.krules.airspot.dev/owned-by": payload["data"]["name"]
                         }
@@ -176,11 +169,108 @@ secret_rulesdata = [
                 }),
                 CleanUpSecrets(
                     owned_by=lambda payload: payload["data"]["name"],
-                    other_than=lambda payload: payload["secret_name"],
+                    other_than=lambda payload: payload["hashed_name"],
                 ),
             ]
         }
     }
 ]
 
-rulesdata = endpoint_rulesdata + secret_rulesdata
+ws_app_rulesdata = [
+    """
+    On fleet create, create dashboard
+    """,
+    {
+        rulename: "on-new-fleet-create-dashboard-service",
+        subscribe_to: ["django.orm.post_save"],
+        ruledata: {
+            filters: [
+                Filter(
+                    lambda payload:
+                    payload.get("signal_kwargs", {}).get("created", False)
+                )
+            ],
+            processing: [
+                SetClusterLocalLabel("lbl_cluster_local"),
+                SetPayloadProperty(
+                    "_kservice", lambda payload: kservice(
+                        labels={**{
+                            "demo.krules.airspot.dev/app": "fleet-dashboard",
+                        }, **payload.get("lbl_cluster_local")},
+                        name="{}-dashboard".format(payload["data"]["name"]),
+                        revision_name="{}-dashboard".format(payload["data"]["name"]),
+                        containers=[{
+                            "name": "web-app",
+                            "image": WS_APP_IMAGE,
+                            "ports": [{
+                                "containerPort": 80
+                            }],
+                            "envFrom": [{
+                                "secretRef": {
+                                    "name": "pusher-credentials",
+                                },
+                            }],
+                            "env": [
+                                {
+                                    "name": "FLEET_CHANNEL",
+                                    "value": payload["data"]["name"]
+                                },
+                                {
+                                    "name": "FLEET_NAME",
+                                    "value": payload["data"]["name"]
+                                },
+                                {
+                                    "name": "DEVICE_DATA_EVENT",
+                                    "value": "device-data"
+                                },
+                            ]
+                        }]
+                    )
+                ),
+                K8sObjectCreate(
+                    lambda payload:  payload["_kservice"]
+                ),
+            ]
+
+        }
+    },
+    """
+    On fleet update (manage cluster-local), update dashboard
+    """,
+    {
+        rulename: "on-update-fleet-update-dashboard-service",
+        subscribe_to: ["django.orm.post_save"],
+        ruledata: {
+            filters: [
+                Filter(
+                    lambda payload:
+                    not payload.get("signal_kwargs", {}).get("created", False)
+                )
+            ],
+            processing: [
+                SetClusterLocalLabel("lbl_cluster_local"),
+                UpdateDashboardService(
+                    lbl_cluster_local=lambda payload: payload.get("lbl_cluster_local")
+                )
+            ]
+        }
+    },
+    """
+    On fleet delete, delete dashboard
+    """,
+    {
+        rulename: "on-fleet-delete-delete-dashboard-service",
+        subscribe_to: "django.orm.post_delete",
+        ruledata: {
+            processing: [
+                # delete endpoint
+                K8sObjectDelete(
+                    apiversion="serving.knative.dev/v1", kind="Service",
+                    name=lambda payload: "{}-dashboard".format(payload["data"]["name"])
+                ),
+            ]
+        }
+    }
+]
+
+rulesdata = endpoint_rulesdata + ws_app_rulesdata + secret_rulesdata

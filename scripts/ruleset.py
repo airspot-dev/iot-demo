@@ -293,6 +293,16 @@ def main():
                 script_module.deploy_py.format(name=name)
             )
         p_ruleset = Path(os.path.join(ruleset_dir, "ruleset.py"))
+        # create empty rulerset function module
+        Path(os.path.join(ruleset_dir, "ruleset_functions")).mkdir(exist_ok=True)
+        p_init_module = Path(os.path.join(ruleset_dir, "ruleset_functions", "__init__.py"))
+        if p_init_module.exists():
+            logger.warning("ruleset_functions/__init__.py already exists.. skipped")
+        else:
+            p_init_module.write_text(
+                script_module.ruleset_functions__init__py
+            )
+
         if p_ruleset.exists():
             logger.warning("ruleset.py already exists.. skipped")
         else:

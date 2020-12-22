@@ -14,6 +14,7 @@ extra_commands = (
 labels = {
     "serving.knative.dev/visibility": "cluster-local",
     "krules.airspot.dev/type": "ruleset",
+    "krules.airspot.dev/ruleset": name
 }
 
 template_annotations = {
