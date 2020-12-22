@@ -1,20 +1,14 @@
-<template>
-  <div>
-    <h1>{{ msg }}</h1>
+<!DOCTYPE html>
+<head>
+  <title>%% fleet_name %% dashboard</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+  <h1>%% fleet_name %% dashboard</h1>
+  <div id="app">
     <div class="panel">
       <div class="panel-heading">
         <h3 class="panel-title">Devices</h3>
-        <b-dropdown id="dropdown-1" class="m-md-2" no-caret>
-          <template v-slot:button-content>
-            <div>
-              <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-                <i class="lnr lnr-alarm"></i>
-                <span class="badge bg-danger">{{ notificationsCount }}</span>
-              </a>
-            </div>
-          </template>
-          <b-dropdown-item v-for="(notification, index) in notifications" :key="index">{{ notification }}</b-dropdown-item>
-        </b-dropdown>
         <div class="right">
           <button type="button" class="btn-toggle-collapse" @click="togglePanel"><i class="lnr lnr-chevron-up"></i></button>
         </div>
@@ -54,52 +48,69 @@
       </div>
     </div>
   </div>
-</template>
 
-<script>
+  <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
 
-import JQuery from 'jquery'
-let $ = JQuery
+    var pusher = new Pusher('%% api_key %%', {
+      cluster: 'eu'
+    });
 
-export default {
-  name: 'Dashboard',
-  components: {
-  },
-  data () {
-    return {
-      msg: process.env['FLEET_NAME'],
-      collapsed: false
-    }
-  },
-  computed: {
-    notifications () {
-      return this.$store.getters['notifications/getNotifications']
-    },
-    devices () {
-      return this.$store.getters['notifications/getDevices']
-    },
-    notificationsCount () {
-      return '' + this.$store.getters['notifications/getNotificationsCount']
-    }
-  },
-  methods: {
-    togglePanel () {
-      this.collapsed = !this.collapsed
-      $('table')[0].hidden = this.collapsed
-      var btn = $('.panel .btn-toggle-collapse')[0]
-      var i = btn.children[0]
-      if (this.collapsed) {
-        i.className = 'lnr lnr-chevron-down'
-      } else {
-        i.className = 'lnr lnr-chevron-up'
-      }
-    }
-  },
-  beforeMount () {
+    var channel = pusher.subscribe('%% fleet_channel %%');
+    channel.bind('%% device_event %%', function(data) {
+      app.devices.push(data);
+    });
+
+    // Vue application
+    const app = new Vue({
+      el: '#app',
+      data: {
+        devices: [],
+      },
+      methods: {
+        togglePanel () {
+          this.collapsed = !this.collapsed
+          $('table')[0].hidden = this.collapsed
+          var btn = $('.panel .btn-toggle-collapse')[0]
+          var i = btn.children[0]
+          if (this.collapsed) {
+            i.className = 'lnr lnr-chevron-down'
+          } else {
+            i.className = 'lnr lnr-chevron-up'
+          }
+        }
+      },
+
+    });
+  </script>
+  <style lang="scss">
+  @import '%% url_for('static', filename='assets/vendor/bootstrap/css/bootstrap.min.css') %%';
+  </style>
+
+  <style lang="scss">
+  @import '/static/assets/vendor/font-awesome/css/font-awesome.min.css';
+  </style>
+  <style lang="scss">
+  @import '/static/assets/vendor/linearicons/style.css';
+  </style>
+  <style lang="scss">
+  @import '/static/assets/vendor/chartist/css/chartist-custom.css';
+  </style>
+  <style lang="scss">
+  @import '/static/assets/css/main.css';
+  </style>
+  <style>
+  #app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
   }
-}
-</script>
-
+  </style>
+  <!-- Add "scoped" attribute to limit CSS to this component only -->
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
@@ -150,3 +161,4 @@ a {
     height: 65vh;
   }
 </style>
+</body>
