@@ -10,10 +10,10 @@ filters = Const.FILTERS
 processing = Const.PROCESSING
 
 from krules_core.providers import proc_events_rx_factory
-from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
+from krules_env import publish_proc_events_errors, publish_proc_events_all  # , publish_proc_events_filtered
 
 proc_events_rx_factory().subscribe(
-  on_next=publish_proc_events_all,
+    on_next=publish_proc_events_all,
 )
 # proc_events_rx_factory().subscribe(
 #  on_next=publish_proc_events_errors,
@@ -21,11 +21,15 @@ proc_events_rx_factory().subscribe(
 from app_functions import hashed
 from k8s_functions import K8sObjectCreate, K8sObjectsQuery
 
-from ruleset_functions import SetSecretName
+try:
+    from ruleset_functions import *
+except ImportError:
+    # for local development
+    from .ruleset_functions import *
 
-IMAGE_DIGEST = 'lorenzocampo/device_endpoint@sha256:99212a0673ee9913d9c9e8f82c5dbb994f2bd54869ae0c1f3b3866ae93af52f0'
+IMAGE_DIGEST = 'lorenzocampo/device-endpoint@sha256:99212a0673ee9913d9c9e8f82c5dbb994f2bd54869ae0c1f3b3866ae93af52f0'
 
-rulesdata = [
+endpoint_rulesdata = [
     """
     On new fleet create secret
     """,
@@ -36,16 +40,14 @@ rulesdata = [
             filters: [
                 Filter(
                     lambda payload:
-                        payload.get("signal_kwargs", {}).get("created", False)
+                    payload.get("signal_kwargs", {}).get("created", False)
                 )
             ],
             processing: [
                 SetSecretName("secret_name"),
-                SetPayloadProperty("labels", lambda payload: (
-                    eval(payload.get("data").get("cluster_local")) and {
-                        "serving.knative.dev/visibility": "cluster-local"
-                    } or {}
-                )),
+                SetClusterLocalLabel("lbl_cluster_local"),
+                Route("ensure-secret"),
+                # fetch broker address
                 K8sObjectsQuery(
                     apiversion="eventing.knative.dev/v1",
                     kind="Broker",
@@ -54,24 +56,10 @@ rulesdata = [
                     )
                 ),
                 K8sObjectCreate(lambda payload: {
-                    "apiVersion": "v1",
-                    "kind": "Secret",
-                    "type": "Opaque",
-                    "metadata": {
-                        "name": payload["secret_name"],
-                        "labels": {
-                            "app.krules.airspot.dev/owned-by": payload["data"]["name"]
-                        }
-                    },
-                    "data": {
-                        "api_key": base64.b64encode(payload["data"]["api_key"].encode("utf-8")).decode("utf-8")
-                    }
-                }),
-                K8sObjectCreate(lambda payload: {
                     "apiVersion": "serving.knative.dev/v1",
                     "kind": "Service",
                     "metadata": {
-                        "labels": {**{"demo.krules.airspot.dev/app": "fleet-endpoint"}, **payload.get("labels")},
+                        "labels": {**{"demo.krules.airspot.dev/app": "fleet-endpoint"}, **payload.get("lbl_cluster_local")},
                         "name": payload["data"]["name"],
                     },
                     "spec": {
@@ -120,10 +108,59 @@ rulesdata = [
                 )
             ],
             processing: [
-                # set the expected secret name
                 SetSecretName("secret_name"),
+                SetClusterLocalLabel("lbl_cluster_local"),
+                Route("ensure-secret"),
+                UpdateService(
+                    secret_name=lambda payload: payload.get("secret_name"),
+                    lbl_cluster_local=lambda payload: payload.get("lbl_cluster_local")
+                )
             ],
         }
     },
 ]
 
+secret_rulesdata = [
+    """
+    Responds to "ensure-secret", If secret already exists do nothing
+    Create it otherwise
+    Remove all others
+    """,
+    {
+        rulename: "ensure-ingestion-apikey-secret",
+        subscribe_to: "ensure-secret",
+        ruledata: {
+            filters: [
+                K8sObjectsQuery(
+                    apiversion="v1",
+                    kind="Secret",
+                    returns=lambda payload: lambda qobjs: (
+                        qobjs.get_or_none(name=payload.get("secret_name")) is None
+                    )
+                )
+            ],
+            processing: [
+                K8sObjectCreate(lambda payload: {
+                    "apiVersion": "v1",
+                    "kind": "Secret",
+                    "type": "Opaque",
+                    "metadata": {
+                        "name": payload["secret_name"],
+                        "labels": {
+                            "app.krules.airspot.dev/owned-by": payload["data"]["name"]
+                        }
+                    },
+                    "data": {
+                        "api_key": base64.b64encode(payload["data"]["api_key"].encode("utf-8")).decode("utf-8")
+                    }
+                }),
+                CleanUpSecrets(
+                    owned_by=lambda payload: payload["data"]["name"],
+                    other_than=lambda payload: payload["secret_name"],
+                ),
+            ]
+        }
+    }
+]
+
+rulesdata = endpoint_rulesdata + secret_rulesdata
