@@ -28,7 +28,7 @@ except ImportError:
     from .ruleset_functions import *
 
 ENDPOINT_IMAGE = 'lorenzocampo/device-endpoint@sha256:99212a0673ee9913d9c9e8f82c5dbb994f2bd54869ae0c1f3b3866ae93af52f0'
-WS_APP_IMAGE = "lorenzocampo/iot-web-app@sha256:9562fea7ba68a088dddd583f7e96bf139a52902b01e910854f75fa577af0c81f"
+WS_APP_IMAGE = "ade8850/dashboard-iot-demo@sha256:d4f4597d138edcd35cd5c2825f3c03ad5a2abca5b6722aa3dc3c8fa5d1b5c4fc"
 
 endpoint_rulesdata = [
     """
@@ -202,9 +202,9 @@ ws_app_rulesdata = [
                         containers=[{
                             "name": "web-app",
                             "image": WS_APP_IMAGE,
-                            "ports": [{
-                                "containerPort": 80
-                            }],
+                            # "ports": [{
+                            #     "containerPort": 80
+                            # }],
                             "envFrom": [{
                                 "secretRef": {
                                     "name": "pusher-credentials",

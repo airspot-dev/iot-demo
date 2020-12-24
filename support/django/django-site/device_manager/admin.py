@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from prettyjson import PrettyJSONWidget
 
 from .models import Fleet, Device, ReceivedData
