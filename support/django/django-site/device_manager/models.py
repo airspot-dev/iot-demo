@@ -3,7 +3,7 @@ from django.db import models
 
 class Fleet(models.Model):
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, primary_key=True)
     api_key = models.CharField(max_length=255)
     endpoint = models.URLField(max_length=255, default="")
     dashboard = models.URLField(max_length=255, default="")
