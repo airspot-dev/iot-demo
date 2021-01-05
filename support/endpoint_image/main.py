@@ -44,20 +44,22 @@ def main():
         else:
             source = socket.gethostname()
 
+        data = request.json
+
         event_time = datetime.utcnow().replace(tzinfo=pytz.UTC).isoformat()
         event = v1.Event()
         event.SetContentType('application/json')
         event.SetEventID(_id)
         event.SetSource(source)
-        event.SetSubject(source)
+        event.SetSubject("device:%s:%s" % (data["owner"], data["deviceid"]))
         event.SetEventTime(event_time)
         event.SetEventType("data-received")
 
         event.Set('Originid', _id)
         event.SetData(
             {
-                "receveidAt": event_time,
-                "data": request.json,
+                "receivedAt": event_time,
+                "data": data,
             }
         )
 

@@ -1,5 +1,5 @@
 
-name = "procevents-post"
+name = "procevents-post-restapi"
 
 add_files = (
     "ruleset.py",

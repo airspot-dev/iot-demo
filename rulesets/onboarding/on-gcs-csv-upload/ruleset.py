@@ -57,7 +57,7 @@ rulesdata = [
                         self.router.route(
                             "onboard-device",
                             subject_factory(
-                                "%s|%s" % (self.payload["path_info"]["fleetname"], device_data.pop("deviceid"))
+                                "device:%s:%s" % (self.payload["path_info"]["fleetname"], device_data.pop("deviceid"))
                             ),
                             {
                                 "data": device_data,
