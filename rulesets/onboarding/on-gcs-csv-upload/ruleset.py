@@ -59,7 +59,7 @@ rulesdata = [
                             {
                                 "data": device_data,
                                 "class": self.payload["path_info"]["deviceclass"],
-                                "fleet": self.payload["path_info"]["fleet"],
+                                "fleet": self.payload["path_info"]["fleetname"],
                             }
                         ),
                     )
