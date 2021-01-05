@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Fleet, Device, ReceivedData
+from .models import Fleet, ReceivedData
 
 
 class FleetSerializer(serializers.ModelSerializer):
@@ -11,19 +11,10 @@ class FleetSerializer(serializers.ModelSerializer):
         ]
 
 
-class DeviceSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Device
-        fields = [
-            'id', 'device_class', 'provisioning_data', 'fleet', 'status',
-        ]
-
-
 class ReceivedDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReceivedData
         fields = [
-            'device', 'data', 'timestamp',
+            'device', 'owner', 'data', 'timestamp',
         ]
