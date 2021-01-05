@@ -19,7 +19,7 @@ def init():
         providers.Factory(lambda name, event_info, event_data:
                           name.startswith("k8s:") and k8s_storage_impl.SubjectsK8sStorage(
                               resource_path=name[4:],
-                              resource_body=event_data.get("k8s_object")
+                              resource_body=event_data and event_data.get("object", event_data) or None,
                           )
                           or redis_storage_impl.SubjectsRedisStorage(
                               name,
