@@ -41,7 +41,7 @@ class SetClusterLocalLabel(SetPayloadProperty):
     def execute(self, payload_target, **kwargs):
 
         super().execute(
-            payload_target, eval(self.payload.get("data").get("cluster_local")) and {
+            payload_target, self.payload.get("data").get("cluster_local") and {
                         "serving.knative.dev/visibility": "cluster-local"
                 } or {}
         )

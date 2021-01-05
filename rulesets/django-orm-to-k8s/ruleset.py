@@ -56,8 +56,8 @@ endpoint_rulesdata = [
                         payload.setdefault("k_sink", objs.get(name="data-received").obj["status"]["address"]["url"])
                     )
                 ),
-                SetPayloadProperty(
-                    "_kservice", lambda payload: kservice(
+                K8sObjectCreate(
+                    lambda payload: kservice(
                         labels={**{"demo.krules.airspot.dev/app": "fleet-endpoint"}, **payload.get("lbl_cluster_local")},
                         name=payload["data"]["name"],
                         revision_name=payload["hashed_name"],
@@ -80,9 +80,6 @@ endpoint_rulesdata = [
                                 ]
                             }]
                     )
-                ),
-                K8sObjectCreate(
-                    lambda payload: payload["_kservice"]
                 ),
             ]
         }
