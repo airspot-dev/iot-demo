@@ -22,7 +22,7 @@ app.config['DEBUG'] = False
 def index():
     return render_template(
         "index.html",
-        api_key=os.environ.get("PUSHER_API_KEY"),
+        api_key=os.environ.get("PUSHER_APIKEY"),
         fleet_name=os.environ.get("FLEET_NAME"),
         fleet_channel=os.environ.get("FLEET_CHANNEL"),
         device_event=os.environ.get("DEVICE_DATA_EVENT")

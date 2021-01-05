@@ -1,5 +1,5 @@
 
-name = "procevents-post"
+name = "on-onboard-device"
 
 add_files = (
     "ruleset.py",
@@ -14,22 +14,26 @@ extra_commands = (
 labels = {
     "serving.knative.dev/visibility": "cluster-local",
     "krules.airspot.dev/type": "ruleset",
-    "configs.krules.airspot.dev/django-restapi-consumer": "inject"
+    "krules.airspot.dev/ruleset": name
 }
 
 template_annotations = {
-    "autoscaling.knative.dev/minScale": "0",
+    #"autoscaling.knative.dev/minScale": "0",
 }
 
 #service_account = "my-service-account"
 
 triggers = (
    {
-       "name": "procevent-post-trigger",
-       "broker": "procevents",
+       "name": "onboard-device",
+       "filter": {
+           "attributes": {
+               "type": "onboard-device"
+           }
+       }
    },
 )
-triggers_default_broker="default"
+triggers_default_broker = "default"
 
 ksvc_sink = "broker:default"
 ksvc_procevents_sink = "broker:procevents"
