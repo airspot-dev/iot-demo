@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path(r'api/', include("django_krules_procevents.urls")),
     path(r'api/device_manager/', include("device_manager.urls")),
+    path(r'api/scheduler/', include("django_krules_scheduler.urls")),
     re_path(r'^$', RedirectView.as_view(url=reverse_lazy('admin:index')))
 ]
