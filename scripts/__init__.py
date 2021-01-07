@@ -101,3 +101,9 @@ ruleset_functions__init__py = """
 from krules_core.base_functions import *
 
 """
+
+README = """\
+# {name}
+
+
+"""

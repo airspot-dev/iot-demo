@@ -17,12 +17,12 @@ from krules_env import publish_proc_events_errors, publish_proc_events_all  #, p
 #     # for local development
 #     from .ruleset_functions import *
     
-proc_events_rx_factory().subscribe(
-  on_next=publish_proc_events_all,
-)
 # proc_events_rx_factory().subscribe(
-#  on_next=publish_proc_events_errors,
+#   on_next=publish_proc_events_all,
 # )
+proc_events_rx_factory().subscribe(
+ on_next=publish_proc_events_errors,
+)
 
 rulesdata = [
     """
@@ -32,6 +32,7 @@ rulesdata = [
     {
         rulename: "on-ksvc-update-set-url-for-apps",
         subscribe_to: [
+            "dev.knative.apiserver.resource.add",
             "dev.knative.apiserver.resource.update",
         ],
         ruledata: {
@@ -46,14 +47,14 @@ rulesdata = [
                     lambda payload: (
                         # a specific subject is created to store reactive properties for frontend apps
                         payload.setdefault("_subject", subject_factory(
-                            f"ksvc:app:{payload['metadata']['labels']['demo.krules.airspot.dev/app']}"
+                            f"ksvc:{payload['metadata']['labels']['demo.krules.airspot.dev/app']}:{payload['metadata']['name'].split('-dashboard')[0]}"
                         )),
                         # this allows us to be more selective in defining the trigger
                         payload["_subject"].set_ext("app", payload['metadata']['labels']['demo.krules.airspot.dev/app']),
                         # we set the url as reactive property so that can react when the service became available
                         # we do not use the subject cache to prevent multiple events
                         # as during the creation phase we could have update events in quick succession
-                        payload["_subject"].set("url", payload['status']['address']['url'], cached=False)
+                        payload["_subject"].set("url", payload['status']['url'], use_cache=False)
                     )
                 )
             ]
@@ -72,7 +73,7 @@ rulesdata = [
                 Process(
                     lambda payload:
                         subject_factory(
-                            f"ksvc:app:{payload['metadata']['labels']['demo.krules.airspot.dev/app']}"
+                            f"ksvc:{payload['metadata']['labels']['demo.krules.airspot.dev/app']}:{payload['metadata']['name']}"
                         ).flush()
                 )
             ]

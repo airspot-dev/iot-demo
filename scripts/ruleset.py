@@ -293,7 +293,7 @@ def main():
                 script_module.deploy_py.format(name=name)
             )
         p_ruleset = Path(os.path.join(ruleset_dir, "ruleset.py"))
-        # create empty rulerset function module
+        # create empty ruleset function module
         Path(os.path.join(ruleset_dir, "ruleset_functions")).mkdir(exist_ok=True)
         p_init_module = Path(os.path.join(ruleset_dir, "ruleset_functions", "__init__.py"))
         if p_init_module.exists():
@@ -309,6 +309,15 @@ def main():
             p_ruleset.write_text(
                 script_module.ruleset_py
             )
+
+        p_readme = Path(os.path.join(ruleset_dir, "README.md"))
+        if p_readme.exists():
+            logger.warning("README.md already exists.. skipped")
+        else:
+            p_readme.write_text(
+                script_module.README.format(name=name)
+            )
+
     elif action == "deploy":
         path = Path(args.get("path")).resolve()
         spec = importlib.util.spec_from_file_location("deploy_spec", os.path.join(path, "__deploy__.py"))
