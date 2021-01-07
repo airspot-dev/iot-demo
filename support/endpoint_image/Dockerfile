@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 ADD . /app
 
-RUN pip install flask json-logging requests cloudevents pytz gunicorn
+RUN pip install pyyaml flask json-logging requests cloudevents==0.3.0 pytz gunicorn krules-env==0.7 krules-subjects-storage-redis==0.7
 
 
 ENV FLASK_APP /app/main.py

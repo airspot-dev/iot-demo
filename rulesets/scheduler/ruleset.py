@@ -68,7 +68,7 @@ rulesdata = [
             ],
             processing: [
                 DoPutApiCall(
-                    path=lambda payload: "/scheduler/scheduled_event/%s/" % payload["uid"],
+                    path=lambda subject: "/scheduler/scheduled_event/%s/" % subject.schedule_status_uid,
                     json=lambda payload: {
                             "payload": payload["payload"],
                             "when": payload["when"],

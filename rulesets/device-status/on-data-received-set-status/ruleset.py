@@ -1,4 +1,3 @@
-
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 from datetime import datetime, timezone, timedelta
@@ -16,14 +15,14 @@ filters = Const.FILTERS
 processing = Const.PROCESSING
 
 from krules_core.providers import proc_events_rx_factory
-from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
+from krules_env import publish_proc_events_errors, publish_proc_events_all  # , publish_proc_events_filtered
 from krules_core.event_types import SUBJECT_PROPERTY_CHANGED
-    
+
 # proc_events_rx_factory().subscribe(
 #   on_next=publish_proc_events_all,
 # )
 proc_events_rx_factory().subscribe(
- on_next=publish_proc_events_errors,
+    on_next=publish_proc_events_errors,
 )
 
 rulesdata = [
@@ -44,11 +43,13 @@ rulesdata = [
                     event_type="schedule-message",
                     payload=lambda self:
                     {
-                        "event_type": self.event_type,
+                        "event_type": "set-device-status",
                         "subject": str(self.subject),
-                        "payload": self.payload,
+                        "payload": {
+                            "value": "INACTIVE"
+                        },
                         "origin_id": self.subject.event_info()["originid"],
-                        "when": (datetime.now(timezone.utc)+timedelta(
+                        "when": (datetime.now(timezone.utc) + timedelta(
                             seconds=int(self.subject.rate))).isoformat(),
                         "replace": "schedule_status_uid" in self.subject
                                    and self.subject.schedule_status_uid is not None
@@ -72,4 +73,3 @@ rulesdata = [
         }
     },
 ]
-

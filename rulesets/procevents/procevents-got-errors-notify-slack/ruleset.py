@@ -26,11 +26,10 @@ rulesdata = [
                 Filter(lambda payload: payload["got_errors"])
             ],
             processing: [
-                SetPayloadProperty("key", 2),
                 Process(
                     lambda self:
                         requests.post(
-                            url=self.configs["slack"]["webhooks"]["errors"],
+                            url=self.configs["slack"]["webhooks"]["errors_channel"],
                             json={
                                 "type": "mrkdwn",
                                 "text":

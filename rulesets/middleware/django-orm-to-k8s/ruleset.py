@@ -27,7 +27,7 @@ except ImportError:
     # for local development
     from .ruleset_functions import *
 
-ENDPOINT_IMAGE = 'lorenzocampo/device-endpoint@sha256:a63a03d780b8f6fee515612ea6802c509f738082ba3d0226dd1fd9574ff47e55'
+ENDPOINT_IMAGE = 'lorenzocampo/device-endpoint@sha256:d7ba9342ba26b98eea7e596ce5b46f3a6be80c77bb988bb13c210a76cbf13fa0'
 WS_APP_IMAGE = "ade8850/dashboard-iot-demo@sha256:d4f4597d138edcd35cd5c2825f3c03ad5a2abca5b6722aa3dc3c8fa5d1b5c4fc"
 
 endpoint_rulesdata = [
@@ -58,27 +58,29 @@ endpoint_rulesdata = [
                 ),
                 K8sObjectCreate(
                     lambda payload: kservice(
-                        labels={**{"demo.krules.airspot.dev/app": "endpoint"}, **payload.get("lbl_cluster_local")},
+                        labels={**{"demo.krules.airspot.dev/app": "endpoint",
+                                   "krules.airspot.dev/type": "middleware-endpoint", },
+                                **payload.get("lbl_cluster_local")},
                         name=payload["data"]["name"],
                         revision_name=payload["hashed_name"],
                         containers=[{
-                                "image": ENDPOINT_IMAGE,
-                                "env": [
-                                    {
-                                        "name": "K_SINK",
-                                        "value": payload["k_sink"],
-                                    },
-                                    {
-                                        "name": "API_KEY",
-                                        "valueFrom": {
-                                            "secretKeyRef": {
-                                                "name": payload["hashed_name"],
-                                                "key": "api_key"
-                                            }
+                            "image": ENDPOINT_IMAGE,
+                            "env": [
+                                {
+                                    "name": "K_SINK",
+                                    "value": payload["k_sink"],
+                                },
+                                {
+                                    "name": "API_KEY",
+                                    "valueFrom": {
+                                        "secretKeyRef": {
+                                            "name": payload["hashed_name"],
+                                            "key": "api_key"
                                         }
                                     }
-                                ]
-                            }]
+                                }
+                            ]
+                        }]
                     )
                 ),
             ]
@@ -145,7 +147,7 @@ secret_rulesdata = [
                     apiversion="v1",
                     kind="Secret",
                     returns=lambda payload: lambda qobjs: (
-                        qobjs.get_or_none(name=payload.get("hashed_name")) is None
+                            qobjs.get_or_none(name=payload.get("hashed_name")) is None
                     )
                 )
             ],

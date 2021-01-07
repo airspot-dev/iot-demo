@@ -14,8 +14,36 @@ import pytz
 import requests
 import json
 import socket
+import krules_env
+from krules_core.route.router import DispatchPolicyConst
+from redis_subjects_storage import storage_impl as redis_storage_impl
+from dependency_injector import providers as providers
 
-app = Flask("ext-api")
+
+from krules_core.providers import (
+    subject_factory,
+    configs_factory,
+    subject_storage_factory,
+    event_router_factory)
+
+krules_env.init()
+
+subjects_redis_storage_settings = configs_factory() \
+    .get("subjects-backends") \
+    .get("redis")
+
+subject_storage_factory.override(
+    providers.Factory(
+        lambda name, event_info, event_data:
+            redis_storage_impl.SubjectsRedisStorage(
+                name,
+                subjects_redis_storage_settings.get("url"),
+                key_prefix=subjects_redis_storage_settings.get("key_prefix")
+            )
+    )
+)
+
+app = Flask("middleware")
 
 json_logging.ENABLE_JSON_LOGGING = True
 json_logging.init_flask()
@@ -34,9 +62,6 @@ req_logger.propagate = False
 @app.route("/", methods=['POST'])
 def main():
     if request.headers.get("authorization", "") == "Bearer %s" % os.environ.get("API_KEY"):
-        _id = str(uuid.uuid4())
-        logging.debug("new event id: {}".format(_id))
-
         if "K_SERVICE" in os.environ:
             source = os.environ["K_SERVICE"]
         elif "SERVICE" in os.environ:
@@ -46,32 +71,14 @@ def main():
 
         data = request.json
 
-        event_time = datetime.utcnow().replace(tzinfo=pytz.UTC).isoformat()
-        event = v1.Event()
-        event.SetContentType('application/json')
-        event.SetEventID(_id)
-        event.SetSource(source)
-        event.SetSubject("device:%s:%s" % (data["owner"], data["deviceid"]))
-        event.SetEventTime(event_time)
-        event.SetEventType("data-received")
-
-        event.Set('Originid', _id)
-        event.SetData(
+        event_router_factory().route(
+            "data-received", subject_factory("device:%s:%s" % (source, data["deviceid"])),
             {
-                "receivedAt": event_time,
+                "receivedAt": datetime.utcnow().replace(tzinfo=pytz.UTC).isoformat(),
                 "data": data,
-            }
+            },
+            dispatch_policy=DispatchPolicyConst.DIRECT
         )
-
-        m = marshaller.NewHTTPMarshaller([binary.NewBinaryHTTPCloudEventConverter()])
-
-        headers, body = m.ToRequest(event, converters.TypeBinary, json.dumps)
-
-        response = requests.post(os.environ.get("K_SINK"),
-                                 headers=headers,
-                                 data=body)
-
-        response.raise_for_status()
         return "OK", 200
     else:
         return "No valid API_KEY provided", 401
