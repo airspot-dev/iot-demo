@@ -5,7 +5,8 @@ from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 import requests
 from datetime import datetime
-from ruleset_functions import DispatchScheduledEvents
+from ruleset_functions import DispatchScheduledEvents, call_to_api
+
 #
 # try:
 #     from ruleset_functions import *
@@ -23,7 +24,7 @@ from krules_core.providers import proc_events_rx_factory, subject_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  # , publish_proc_events_filtered
 
 proc_events_rx_factory().subscribe(
-  on_next=pprint,
+    on_next=pprint,
 )
 # proc_events_rx_factory().subscribe(
 #     on_next=publish_proc_events_errors,
@@ -41,6 +42,20 @@ rulesdata = [
                 Filter(lambda payload: not payload.get("replace", False))
             ],
             processing: [
+                PyCall(
+                    call_to_api,
+                    kwargs=lambda self: {
+                        "url": "%s/scheduler/scheduled_event/" % self.configs["django"]["restapi"]["url"],
+                        "headers": {"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
+                        "json": {
+                            "event_type": self.payload["event_type"],
+                            "subject": self.payload["subject"],
+                            "payload": self.payload["payload"],
+                            "origin_id": self.payload["origin_id"],
+                            "when": self.payload["when"],
+                        }
+                    }
+                ),
                 Process(
                     lambda self:
                     requests.post(
@@ -51,7 +66,7 @@ rulesdata = [
                             "subject": self.payload["subject"],
                             "payload": self.payload["payload"],
                             "origin_id": self.payload["origin_id"],
-                            "when": self.payload["data"],
+                            "when": self.payload["when"],
                         }
                     )
                 )
@@ -66,7 +81,7 @@ rulesdata = [
         subscribe_to: "schedule-message",
         ruledata: {
             filters: [
-                Filter(lambda payload: payload.get("replace", False))
+                Filter(lambda payload: payload.get("replace", True))
             ],
             processing: [
                 Process(
@@ -77,7 +92,7 @@ rulesdata = [
                         headers={"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
                         json={
                             "payload": self.payload["payload"],
-                            "when": self.payload["data"],
+                            "when": self.payload["when"],
                         }
                     )
                 )
