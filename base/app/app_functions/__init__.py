@@ -57,20 +57,20 @@ class DoPostApiCall(DoRestApiCall):
 
 class DoPatchApiCall(DoRestApiCall):
 
-    def execute(self, path, method="patch", json=None, **kwargs):
+    def execute(self, path, json=None, **kwargs):
 
         super().execute(path, method="patch", json=json, **kwargs)
 
 
 class DoPutApiCall(DoRestApiCall):
 
-    def execute(self, path, method="put", json=None, **kwargs):
+    def execute(self, path, json=None, **kwargs):
 
         super().execute(path, method="put", json=json, **kwargs)
 
 
 class DoGetApiCall(DoRestApiCall):
 
-    def execute(self, path, method="get", **kwargs):
+    def execute(self, path, **kwargs):
 
         super().execute(path, method="get", json=None, **kwargs)
