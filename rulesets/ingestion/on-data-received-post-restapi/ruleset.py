@@ -36,7 +36,7 @@ rulesdata = [
         subscribe_to: ["data-received"],
         ruledata: {
             filters: [
-                SubjectNameMatch("device:(?P<owner>.+):(?P<devicename>.+)",payload_dest="device_info")
+                SubjectNameMatch("device:(?P<owner>.+):(?P<devicename>.+)", payload_dest="device_info")
             ],
             processing: [
                 SetSubjectProperty("lastSeen", datetime.now(timezone.utc).isoformat()),

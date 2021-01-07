@@ -34,7 +34,7 @@ triggers = (
        }
    },
    {
-       "name": "class-a-data-received",
+       "name": "class-b-data-received",
        "filter": {
            "attributes": {
                "type": "subject-property-changed",

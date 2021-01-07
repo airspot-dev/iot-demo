@@ -1,5 +1,4 @@
-from pprint import pprint
-
+from app_functions import DoPostApiCall, DoPutApiCall
 from krules_core.base_functions.misc import PyCall
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
@@ -23,12 +22,12 @@ processing = Const.PROCESSING
 from krules_core.providers import proc_events_rx_factory, subject_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  # , publish_proc_events_filtered
 
-proc_events_rx_factory().subscribe(
-    on_next=pprint,
-)
 # proc_events_rx_factory().subscribe(
-#     on_next=publish_proc_events_errors,
+#     on_next=publish_proc_events_all,
 # )
+proc_events_rx_factory().subscribe(
+    on_next=publish_proc_events_errors,
+)
 
 rulesdata = [
     """
@@ -42,34 +41,18 @@ rulesdata = [
                 Filter(lambda payload: not payload.get("replace", False))
             ],
             processing: [
-                PyCall(
-                    call_to_api,
-                    kwargs=lambda self: {
-                        "url": "%s/scheduler/scheduled_event/" % self.configs["django"]["restapi"]["url"],
-                        "headers": {"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
-                        "json": {
-                            "event_type": self.payload["event_type"],
-                            "subject": self.payload["subject"],
-                            "payload": self.payload["payload"],
-                            "origin_id": self.payload["origin_id"],
-                            "when": self.payload["when"],
-                        }
-                    }
+                DoPostApiCall(
+                    path="/scheduler/scheduled_event/",
+                    json=lambda payload: {
+                            "event_type": payload["event_type"],
+                            "subject": payload["subject"],
+                            "payload": payload["payload"],
+                            "origin_id": payload["origin_id"],
+                            "when": payload["when"],
+                    },
+                    on_success=lambda self:
+                        lambda ret: self.subject.set("schedule_status_uid", ret.json()["uid"], muted=True)
                 ),
-                Process(
-                    lambda self:
-                    requests.post(
-                        url="%s/scheduler/scheduled_event/" % self.configs["django"]["restapi"]["url"],
-                        headers={"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
-                        json={
-                            "event_type": self.payload["event_type"],
-                            "subject": self.payload["subject"],
-                            "payload": self.payload["payload"],
-                            "origin_id": self.payload["origin_id"],
-                            "when": self.payload["when"],
-                        }
-                    )
-                )
             ]
         }
     },
@@ -84,17 +67,12 @@ rulesdata = [
                 Filter(lambda payload: payload.get("replace", True))
             ],
             processing: [
-                Process(
-                    lambda self:
-                    requests.put(
-                        url="%s/scheduler/scheduled_event/%s" %
-                            (self.configs["django"]["restapi"]["url"], self.payload["uid"]),
-                        headers={"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
-                        json={
-                            "payload": self.payload["payload"],
-                            "when": self.payload["when"],
-                        }
-                    )
+                DoPutApiCall(
+                    path=lambda payload: "/scheduler/scheduled_event/%s/" % payload["uid"],
+                    json=lambda payload: {
+                            "payload": payload["payload"],
+                            "when": payload["when"],
+                    }
                 )
             ]
         }
