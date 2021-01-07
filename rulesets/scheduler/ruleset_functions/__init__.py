@@ -1,15 +1,17 @@
+from datetime import datetime, timezone
 import requests
+
 from krules_core.base_functions import RuleFunctionBase
-from datetime import datetime
 
 
 class DispatchScheduledEvents(RuleFunctionBase):
 
     def execute(self):
         headers = {"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]}
+        url = "%s/scheduler/scheduled_event?when__lte=%s" % (
+                self.configs["django"]["restapi"]["url"], datetime.now(timezone.utc).isoformat())
         response = requests.get(
-            url="%s/scheduler/scheduled_event?when__lte=%s" % (
-                self.configs["django"]["restapi"]["url"], datetime.now().isoformat()),
+            url=url.replace("+", "%2B"),
             headers=headers
 
         )
