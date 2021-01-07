@@ -23,6 +23,9 @@ proc_events_rx_factory().subscribe(
  on_next=publish_proc_events_errors,
 )
 
+# google credentials are stored in the configurations provider
+# rather then in its own secret mounted as a volume
+# so we write it down in a file when the container is ready
 with open("google-cloud-key.json", "w") as f:
     f.write(configs_factory()["google-cloud"]["credentials"]["key.json"])
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.abspath(f.name)
@@ -54,7 +57,7 @@ rulesdata = [
                         self.router.route(
                             "onboard-device",
                             subject_factory(
-                                "%s|%s" % (self.payload["path_info"]["fleetname"], device_data.pop("deviceid"))
+                                "device:%s:%s" % (self.payload["path_info"]["fleetname"], device_data.pop("deviceid"))
                             ),
                             {
                                 "data": device_data,

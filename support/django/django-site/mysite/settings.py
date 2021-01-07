@@ -49,6 +49,7 @@ INSTALLED_APPS = admin_config.get(
       'prettyjson',
       'django_krules_procevents',
       'rest_framework',
+       'django_krules_scheduler'
     ]
 )
 # INSTALLED_APPS = [

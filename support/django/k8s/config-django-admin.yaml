@@ -30,6 +30,7 @@ spec:
       - 'device_manager'
       - 'rest_framework'
       - 'rest_framework.authtoken'
+      - 'django_krules_scheduler'
     loglevel: "info"
     debug: "False"
   container:
