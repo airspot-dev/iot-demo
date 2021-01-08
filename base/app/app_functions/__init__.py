@@ -1,7 +1,9 @@
 import pprint
 import hashlib
 import requests
+import pusher
 from krules_core.base_functions.misc import PyCall
+from krules_core.base_functions import RuleFunctionBase
 
 
 def hashed(name, *args, length=10):
@@ -74,3 +76,31 @@ class DoGetApiCall(DoRestApiCall):
     def execute(self, path, **kwargs):
 
         super().execute(path, method="get", json=None, **kwargs)
+
+
+class DoDeleteApiCall(DoRestApiCall):
+
+    def execute(self, path, **kwargs):
+        super().execute(path, method="delete", json=None, **kwargs)
+
+
+class WebsocketNotificationEventClass(object):
+
+    CHEERING = "cheering"
+    WARNING = "warning"
+    CRITICAL = "critical"
+    NORMAL = "normal"
+
+
+class WebsocketDevicePublishMessage(RuleFunctionBase):
+
+    def execute(self, channel, event, data):
+        pusher_client = pusher.Pusher(
+            app_id=self.configs["pusher"]["credentials"]["app_id"],
+            key=self.configs["pusher"]["credentials"]["key"],
+            secret=self.configs["pusher"]["credentials"]["secret"],
+            cluster=self.configs["pusher"]["credentials"]["cluster"],
+            ssl=True
+        )
+
+        pusher_client.trigger(channel, event, data)

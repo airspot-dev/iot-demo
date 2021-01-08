@@ -27,7 +27,7 @@ except ImportError:
     # for local development
     from .ruleset_functions import *
 
-ENDPOINT_IMAGE = 'lorenzocampo/device-endpoint@sha256:d7ba9342ba26b98eea7e596ce5b46f3a6be80c77bb988bb13c210a76cbf13fa0'
+ENDPOINT_IMAGE = 'lorenzocampo/device-endpoint@sha256:97f7aebd823771ebd47f5b3ea9cd4f4d2f43666fddfe0810d9fa00e68dbcbdc0'
 WS_APP_IMAGE = "ade8850/dashboard-iot-demo@sha256:d4f4597d138edcd35cd5c2825f3c03ad5a2abca5b6722aa3dc3c8fa5d1b5c4fc"
 
 endpoint_rulesdata = [

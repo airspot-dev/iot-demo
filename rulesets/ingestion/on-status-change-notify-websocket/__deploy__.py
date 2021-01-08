@@ -1,5 +1,5 @@
 
-name = "on-data-received-set-status"
+name = "on-status-change-notify-websocket"
 
 add_files = (
     "ruleset.py",
@@ -8,14 +8,16 @@ add_files = (
 add_modules = True  # find modules in directory (folders having __init__.py file) and add them to container
 
 extra_commands = (
-#    ("RUN", "pip install my-wonderful-lib==1.0")
+    ("RUN", "apk add libffi-dev "),
+    ("RUN", "apk add openssl-dev"),
+    ("RUN", "pip3 install pusher==3.0.0"),
 )
 
 labels = {
     "serving.knative.dev/visibility": "cluster-local",
     "krules.airspot.dev/type": "ruleset",
-    "configs.krules.airspot.dev/django-restapi-consumer": "inject",
-    "krules.airspot.dev/ruleset": name
+    "krules.airspot.dev/ruleset": name,
+    "configs.krules.airspot.dev/pusher": "inject"
 }
 
 template_annotations = {
@@ -29,21 +31,14 @@ triggers = (
        "name": name,
        "filter": {
            "attributes": {
-               "type": "subject-property-changed",
                "phase": "running",
+               "type": "subject-property-changed",
+               "propertyname": "status"
            }
        }
    },
-   {
-       "name": "%s-inactive" % name,
-       "filter": {
-           "attributes": {
-               "type": "set-device-status",
-           }
-       },
-   }
 )
-triggers_default_broker = "default"
+triggers_default_broker="default"
 
 ksvc_sink = "broker:default"
 ksvc_procevents_sink = "broker:procevents"

@@ -29,7 +29,7 @@ proc_events_rx_factory().subscribe(
 
 rulesdata = [
     """
-    Rule description here..
+    When receive a new device data post it to Rest API
     """,
     {
         rulename: "on-data-received-post-restapi",

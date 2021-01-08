@@ -198,3 +198,5 @@ logging.config.dictConfig({
 
 PROCEVENTS_AUTHENTICATION_CLASSES = ['rest_framework.authentication.TokenAuthentication', ]
 PROCEVENTS_PERMISSION_CLASSES = ['rest_framework.permissions.IsAuthenticated', ]
+SCHEDULED_EVENTS_AUTHENTICATION_CLASSES = ['rest_framework.authentication.TokenAuthentication', ]
+SCHEDULED_EVENTS_PERMISSION_CLASSES = ['rest_framework.permissions.IsAuthenticated', ]

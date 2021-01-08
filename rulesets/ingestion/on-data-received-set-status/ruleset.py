@@ -1,6 +1,8 @@
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 from datetime import datetime, timezone, timedelta
+from app_functions import DoPostApiCall
+from uuid import uuid4
 
 # try:
 #     from ruleset_functions import *
@@ -39,22 +41,21 @@ rulesdata = [
             ],
             processing: [
                 SetSubjectProperty("status", "ACTIVE"),
-                Route(
-                    event_type="schedule-message",
-                    payload=lambda self:
-                    {
+                DoPostApiCall(
+                    path="/scheduler/scheduled_event/",
+                    json=lambda subject: {
+                        "uid": str(getattr(subject, "schedule_status_uid", uuid4())),
                         "event_type": "set-device-status",
-                        "subject": str(self.subject),
+                        "subject": subject.name,
                         "payload": {
                             "value": "INACTIVE"
                         },
-                        "origin_id": self.subject.event_info()["originid"],
+                        "origin_id": subject.event_info()["originid"],
                         "when": (datetime.now(timezone.utc) + timedelta(
-                            seconds=int(self.subject.rate))).isoformat(),
-                        "replace": "schedule_status_uid" in self.subject
-                                   and self.subject.schedule_status_uid is not None
+                            seconds=int(subject.rate))).isoformat(),
                     },
-                    dispatch_policy=DispatchPolicyConst.DIRECT
+                    on_success=lambda self:
+                    lambda ret: self.subject.set("schedule_status_uid", ret.json()["uid"], muted=True)
                 ),
             ]
         }

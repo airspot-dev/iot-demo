@@ -1,35 +1,19 @@
 from datetime import datetime, timezone
-import requests
-
-from krules_core.base_functions import RuleFunctionBase
-from providers import subject_factory
+from app_functions import DoGetApiCall
+import urllib
 
 
-class DispatchScheduledEvents(RuleFunctionBase):
+class DispatchScheduledEvents(DoGetApiCall):
 
-    def execute(self):
-        headers = {"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]}
-        url = "%s/scheduler/scheduled_event?when__lte=%s" % (
-                self.configs["django"]["restapi"]["url"], datetime.now(timezone.utc).isoformat())
-        response = requests.get(
-            url=url.replace("+", "%2B"),
-            headers=headers
-
-        )
-        response.raise_for_status()
+    def _dispatch_scheduled_event(self, response):
         for event in response.json():
-            sub = subject_factory(event["subject"])
-            self.router.route(event["event_type"], sub, event["payload"])
-            resp = requests.delete(
-                url="%s/scheduler/scheduled_event/%s" %
-                    (self.configs["django"]["restapi"]["url"], event["uid"]),
-                headers=headers
-            )
-            resp.raise_for_status()
-            sub.set("schedule_status_uid", None, muted=True)
+            self.router.route("dispatch-event", self.subject, payload=event)
 
+    def execute(self, *args, **kwargs):
+        url = "/scheduler/scheduled_event?when__lte=%s" % \
+              urllib.parse.quote_plus(datetime.now(timezone.utc).isoformat())
 
-def call_to_api(url, method, headers, **kwargs):
-    resp = eval("requests.%s" % method)(url, headers=headers, **kwargs)
-    resp.raise_for_status()
-    return resp.json()
+        super().execute(
+            url,
+            on_success=self._dispatch_scheduled_event
+        )

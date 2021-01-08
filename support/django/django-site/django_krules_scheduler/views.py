@@ -45,5 +45,5 @@ class ScheduledEventViewSet(viewsets.ModelViewSet):
             qp[key] = self.request.query_params.get(key)
         return ScheduledEvent.objects.filter(**qp)
 
-    def destroy(self, request, *args, **kwargs):
-        super().destroy(request, *args, **kwargs)
+    # def destroy(self, request, *args, **kwargs):
+    #     return super().destroy(request, *args, **kwargs)
