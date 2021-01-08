@@ -62,7 +62,7 @@ endpoint_rulesdata = [
                                    "krules.airspot.dev/type": "middleware-endpoint", },
                                 **payload.get("lbl_cluster_local")},
                         name=payload["data"]["name"],
-                        revision_name=payload["hashed_name"],
+                        revision_name=payload["data"]["name"],
                         containers=[{
                             "image": ENDPOINT_IMAGE,
                             "env": [

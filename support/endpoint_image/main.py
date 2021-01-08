@@ -70,9 +70,10 @@ def main():
             source = socket.gethostname()
 
         data = request.json
-
+        subject = subject_factory("device:%s:%s" % (source, data["deviceid"]))
+        subject.set_ext("status", "running", use_cache=False)
         event_router_factory().route(
-            "data-received", subject_factory("device:%s:%s" % (source, data["deviceid"])),
+            "data-received", subject,
             {
                 "receivedAt": datetime.utcnow().replace(tzinfo=pytz.UTC).isoformat(),
                 "data": data,
