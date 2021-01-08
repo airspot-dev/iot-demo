@@ -46,7 +46,7 @@ rulesdata = [
                 # We define the status property as both extended and reactive to make the definition of the triggers
                 # that can activate logic, e.g. device-status, more granular, depending on whether the device is running
                 # or onboarded, further increasing the resilience of the system
-                SetSubjectExtendedProperty("status", "onboarded", cached=False),
+                SetSubjectExtendedProperty("phase", "onboarded", cached=False),
                 SetSubjectProperty('status', 'READY')
             ]
         }

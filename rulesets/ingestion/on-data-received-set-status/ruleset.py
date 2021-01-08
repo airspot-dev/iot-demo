@@ -55,7 +55,7 @@ rulesdata = [
                                    and self.subject.schedule_status_uid is not None
                     },
                     dispatch_policy=DispatchPolicyConst.DIRECT
-                )
+                ),
             ]
         }
     },
@@ -71,5 +71,22 @@ rulesdata = [
                 SetSubjectProperty("status", lambda payload: payload["value"])
             ]
         }
+    },
+
+    """
+    Since we have already intercepted the subject property changed event inside the container we need to send it out 
+    explicitly
+    """,
+    {
+        rulename: "device-status-propagate",
+        subscribe_to: SUBJECT_PROPERTY_CHANGED,
+        ruledata: {
+            filters: [
+                Filter(lambda payload: payload["property_name"] == "status")
+            ],
+            processing: [
+                Route(dispatch_policy=DispatchPolicyConst.DIRECT)
+            ]
+        },
     },
 ]
