@@ -3,14 +3,14 @@ import base64
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 
+from krules_core.providers import proc_events_rx_factory
+from krules_env import publish_proc_events_errors, publish_proc_events_all  # , publish_proc_events_filtered
+
 rulename = Const.RULENAME
 subscribe_to = Const.SUBSCRIBE_TO
 ruledata = Const.RULEDATA
 filters = Const.FILTERS
 processing = Const.PROCESSING
-
-from krules_core.providers import proc_events_rx_factory
-from krules_env import publish_proc_events_errors, publish_proc_events_all  # , publish_proc_events_filtered
 
 proc_events_rx_factory().subscribe(
     on_next=publish_proc_events_all,
@@ -56,13 +56,24 @@ endpoint_rulesdata = [
                         payload.setdefault("k_sink", objs.get(name="data-received").obj["status"]["address"]["url"])
                     )
                 ),
+                # TODO: use ConfigurationProvider
+                K8sObjectsQuery(  # krules env specific conf
+                    apiversion="v1",
+                    kind="ConfigMap",
+                    selector={
+                        "config.krules.airspot.dev/provider": "config-krules-subjects-redis"
+                    },
+                    foreach=lambda payload: lambda obj:
+                        payload.setdefault("cm-config-krules-subjects-redis", obj.name)
+                ),
                 K8sObjectCreate(
                     lambda payload: kservice(
-                        labels={**{"demo.krules.airspot.dev/app": "endpoint",
-                                   "krules.airspot.dev/type": "middleware-endpoint", },
-                                **payload.get("lbl_cluster_local")},
+                        labels={
+                            **{
+                                "krules.airspot.dev/type": "endpoint",
+                            }, **payload.get("lbl_cluster_local")},
                         name=payload["data"]["name"],
-                        revision_name=payload["data"]["name"],
+                        revision_name=payload["hashed_name"],
                         containers=[{
                             "image": ENDPOINT_IMAGE,
                             "env": [
@@ -79,8 +90,29 @@ endpoint_rulesdata = [
                                         }
                                     }
                                 }
+                            ],
+                            "envFrom": [
+                                {
+                                    "secretRef": {
+                                        "name": "redis-credentials"
+                                    }
+                                },
+                            ],
+                            "volumeMounts": [
+                                {
+                                    "mountPath": "/krules/config/subjects-backends/redis",
+                                    "name": "config-krules-subjects-redis",
+                                    "readOnly": True
+                                }
                             ]
-                        }]
+
+                        }],
+                        volumes=[{
+                            "configMap": {
+                                "name": payload["cm-config-krules-subjects-redis"]
+                            },
+                            "name": "config-krules-subjects-redis"
+                        }],
                     )
                 ),
             ]
@@ -194,7 +226,7 @@ ws_app_rulesdata = [
                 K8sObjectCreate(
                     lambda payload: kservice(
                         labels={**{
-                            "demo.krules.airspot.dev/app": "dashboard",
+                            "krules.airspot.dev/type": "dashboard",
                         }, **payload.get("lbl_cluster_local")},
                         name="{}-dashboard".format(payload["data"]["name"]),
                         revision_name="{}-dashboard".format(payload["data"]["name"]),

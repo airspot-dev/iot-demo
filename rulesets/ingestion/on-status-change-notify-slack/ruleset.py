@@ -29,30 +29,6 @@ proc_events_rx_factory().subscribe(
 
 rulesdata = [
     """
-    Notify onboarded (READY)
-    """,
-    {
-        rulename: "on-device-ready-notify-slack",
-        subscribe_to: SUBJECT_PROPERTY_CHANGED,
-        ruledata: {
-            filters: [
-                Filter(lambda payload: payload.get("value") == "READY")
-            ],
-            processing: [
-                Process(
-                    lambda self:
-                        requests.post(
-                            url=self.configs["slack"]["webhooks"]["devices_channel"],
-                            json={
-                                "type": "mrkdwn",
-                                "text": ":+1: device *{}* on board! ".format(self.subject.name)
-                            }
-                        )
-                )
-            ]
-        }
-    },
-    """
     Notify ACTIVE
     """,
     {
@@ -69,8 +45,8 @@ rulesdata = [
                             url=self.configs["slack"]["webhooks"]["devices_channel"],
                             json={
                                 "type": "mrkdwn",
-                                "text": ":white_check_mark: device *{}* is now *{}*".format(
-                                    self.subject.name, self.payload.get("value")
+                                "text": ":white_check_mark: *{}* >> device *{}* is now *{}*".format(
+                                    self.subject.name.split(":")[1], self.subject.name.split(":")[2], self.payload.get("value")
                                 )
                             }
                         )
@@ -95,8 +71,8 @@ rulesdata = [
                             url=self.configs["slack"]["webhooks"]["devices_channel"],
                             json={
                                 "type": "mrkdwn",
-                                "text": ":ballot_box_with_check: device *{}* become *{}*".format(
-                                    self.subject.name, self.payload.get("value")
+                                "text": ":ballot_box_with_check: *{}* >> device *{}* becomes *{}*".format(
+                                    self.subject.name.split(":")[1], self.subject.name.split(":")[2], self.payload.get("value")
                                 )
                             }
                         )
