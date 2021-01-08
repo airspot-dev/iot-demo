@@ -71,7 +71,7 @@ def main():
 
         data = request.json
         subject = subject_factory("device:%s:%s" % (source, data["deviceid"]))
-        subject.set_ext("status", "running", use_cache=False)
+        subject.set_ext("phase", "running", use_cache=False)
         event_router_factory().route(
             "data-received", subject,
             {
