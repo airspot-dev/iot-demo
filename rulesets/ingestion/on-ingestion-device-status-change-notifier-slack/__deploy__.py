@@ -26,10 +26,12 @@ template_annotations = {
 
 triggers = (
    {
-       "name": "on-ingestion-device-status-change-notifier-slack",
+       "name": name,
        "filter": {
            "attributes": {
-               "type": "subject-property-changed"
+               "type": "subject-property-changed",
+               "propertyname": "status",
+               "phase": "running",
            }
        }
    },
