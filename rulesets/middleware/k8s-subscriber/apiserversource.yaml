@@ -10,7 +10,7 @@ spec:
       kind: Service
       selector:
         matchExpressions:
-          - { key: demo.krules.airspot.dev/app, operator: In, values: [ endpoint, dashboard ] }
+          - { key: krules.airspot.dev/type, operator: In, values: [ endpoint, dashboard ] }
   sink:
     ref:
       apiVersion: serving.knative.dev/v1

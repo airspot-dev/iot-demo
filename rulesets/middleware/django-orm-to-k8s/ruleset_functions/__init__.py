@@ -3,7 +3,7 @@ from k8s_functions import K8sObjectsQuery
 from krules_core.base_functions import SetPayloadProperty
 
 
-def kservice(labels, name, revision_name, containers):
+def kservice(labels, name, revision_name, containers, volumes=[]):
     obj = {
         "apiVersion": "serving.knative.dev/v1",
         "kind": "Service",
@@ -16,6 +16,7 @@ def kservice(labels, name, revision_name, containers):
                 "metadata": {},
                 "spec": {
                     "containers": containers,
+                    "volumes": volumes,
                 }
             }
         }
@@ -95,7 +96,7 @@ class UpdateEndpointService(K8sObjectsQuery):
         super().execute(
             apiversion="serving.knative.dev/v1", kind="Service",
             selector={
-                "demo.krules.airspot.dev/app": "fleet-endpoint"
+                "krules.airspot.dev/type": "endpoint"
             },
             returns=lambda qobjs: (
                 self._update_obj(qobjs.get_by_name(self.payload.get("data").get("name")), hashed_name, lbl_cluster_local)
@@ -120,7 +121,7 @@ class UpdateDashboardService(K8sObjectsQuery):
         super().execute(
             apiversion="serving.knative.dev/v1", kind="Service",
             selector={
-                "demo.krules.airspot.dev/app": "fleet-dashboard"
+                "krules.airspot.dev/type": "dashboard"
             },
             returns=lambda qobjs: (
                 self._update_obj(
