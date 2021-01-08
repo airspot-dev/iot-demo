@@ -1,5 +1,5 @@
 
-name = "on-onboarding-device-status-change-notifier-slack"
+name = "on-onboard-device-notify-slack"
 
 add_files = (
     "ruleset.py",
@@ -31,7 +31,8 @@ triggers = (
            "attributes": {
                "type": "subject-property-changed",
                "propertyname": "status",
-               "phase": "onboarding"
+               "subjecttype": "device",
+               "phase": "onboarded"
            }
        }
    },

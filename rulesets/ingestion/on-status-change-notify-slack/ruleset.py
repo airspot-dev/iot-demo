@@ -45,8 +45,8 @@ rulesdata = [
                             url=self.configs["slack"]["webhooks"]["devices_channel"],
                             json={
                                 "type": "mrkdwn",
-                                "text": ":white_check_mark: device *{}* is now *{}*".format(
-                                    self.subject.name, self.payload.get("value")
+                                "text": ":white_check_mark: *{}* >> device *{}* is now *{}*".format(
+                                    self.subject.name.split(":")[1], self.subject.name.split(":")[2], self.payload.get("value")
                                 )
                             }
                         )
@@ -71,8 +71,8 @@ rulesdata = [
                             url=self.configs["slack"]["webhooks"]["devices_channel"],
                             json={
                                 "type": "mrkdwn",
-                                "text": ":ballot_box_with_check: device *{}* become *{}*".format(
-                                    self.subject.name, self.payload.get("value")
+                                "text": ":ballot_box_with_check: *{}* >> device *{}* become *{}*".format(
+                                    self.subject.name.split(":")[1], self.subject.name.split(":")[2], self.payload.get("value")
                                 )
                             }
                         )

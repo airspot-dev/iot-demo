@@ -1,5 +1,5 @@
 
-name = "on-ingestion-device-status-change-notifier-slack"
+name = "on-status-change-notify-slack"
 
 add_files = (
     "ruleset.py",
@@ -31,6 +31,7 @@ triggers = (
            "attributes": {
                "type": "subject-property-changed",
                "propertyname": "status",
+               "subjecttype": "device",
                "phase": "running",
            }
        }
