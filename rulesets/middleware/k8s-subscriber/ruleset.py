@@ -17,12 +17,12 @@ from krules_env import publish_proc_events_errors, publish_proc_events_all  #, p
 #     # for local development
 #     from .ruleset_functions import *
     
-# proc_events_rx_factory().subscribe(
-#   on_next=publish_proc_events_all,
-# )
 proc_events_rx_factory().subscribe(
- on_next=publish_proc_events_errors,
+  on_next=publish_proc_events_all,
 )
+# proc_events_rx_factory().subscribe(
+#  on_next=publish_proc_events_errors,
+# )
 
 rulesdata = [
     """
@@ -39,7 +39,7 @@ rulesdata = [
             filters: [
                 Filter(
                     lambda payload:
-                        "address" in payload["status"]
+                        "address" in payload.get("status", {})
                 ),
             ],
             processing: [

@@ -1,4 +1,0 @@
-resources:
-  - broker.yaml
-  - trigger.yaml
-  - event-display.yaml

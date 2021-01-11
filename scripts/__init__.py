@@ -9,7 +9,7 @@ add_files = (
 add_modules = True  # find modules in directory (folders having __init__.py file) and add them to container
 
 extra_commands = (
-#    ("RUN", "pip install my-wonderful-lib==1.0")
+#    ("RUN", "pip install my-wonderful-lib==1.0"),
 )
 
 labels = {{
@@ -27,7 +27,7 @@ template_annotations = {{
 triggers = (
 #    {{
 #        "name": "test-trigger",
-#        # broker: "my-broker"
+#        # broker: "my-broker",
 #        "filter": {{
 #            "attributes": {{
 #                "type": "my-type"
@@ -37,7 +37,7 @@ triggers = (
 #    }},
 #    ...
 )
-triggers_default_broker="default"
+triggers_default_broker = "default"
 
 ksvc_sink = "broker:default"
 ksvc_procevents_sink = "broker:procevents"
