@@ -1,5 +1,5 @@
 
-name = "on-status-change-notify-websocket"
+name = "on-status-change-notifier-websocket"
 
 add_files = (
     "ruleset.py",

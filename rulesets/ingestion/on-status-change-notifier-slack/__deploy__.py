@@ -1,5 +1,5 @@
 
-name = "on-status-change-notify-slack"
+name = "on-status-change-notifier-slack"
 
 add_files = (
     "ruleset.py",
