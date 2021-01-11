@@ -25,7 +25,7 @@ template_annotations = {
 
 triggers = (
    {
-       "name": "%s-data-received" % name,
+       "name": "class-a-%s-data-received" % name,
        "filter": {
            "attributes": {
                "type": "data-received",
@@ -35,7 +35,7 @@ triggers = (
        }
    },
    {
-       "name": name,
+       "name": "class-a-%s-tempc-changed" % name,
        "filter": {
            "attributes": {
                "type": "subject-property-changed",

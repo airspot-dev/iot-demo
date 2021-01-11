@@ -26,7 +26,7 @@ template_annotations = {
 
 triggers = (
    {
-       "name": "%s-temp-status-recheck" % name,
+       "name": "class-a-%s-temp-status-recheck" % name,
        "filter": {
            "attributes": {
                "type": "temp-status-recheck",
@@ -36,7 +36,7 @@ triggers = (
        }
    },
    {
-       "name": name,
+       "name": "class-a-%s-prop-change" % name,
        "filter": {
            "attributes": {
                "type": "subject-property-changed",

@@ -26,7 +26,7 @@ template_annotations = {
 
 triggers = (
    {
-       "name": "on-temp-status-change-notifier-slack-back-to-normal",
+       "name": "class-a-%s-back-to-normal" % name,
        "filter": {
            "attributes": {
                "type": "temp-status-back-to-normal"
@@ -34,7 +34,7 @@ triggers = (
        }
    },
    {
-       "name": "on-temp-status-change-notifier-slack-status-bad",
+       "name": "class-a-%s-status-bad" % name,
        "filter": {
            "attributes": {
                "type": "temp-status-bad"
@@ -42,7 +42,7 @@ triggers = (
        }
    },
    {
-       "name": "on-temp-status-change-notifier-slack-status-still-bad",
+       "name": "class-a-%s-status-still-bad" % name,
        "filter": {
            "attributes": {
                "type": "temp-status-still-bad"
