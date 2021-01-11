@@ -38,7 +38,7 @@ rulesdata = [
                 Filter(lambda payload: "tempc" in payload["data"])
             ],
             processing: [
-                SetSubjectProperty("tempc", lambda payload: payload["data"]["tempc"], cached=False)
+                SetSubjectProperty("tempc", lambda payload: payload["data"]["tempc"], use_cache=False)
             ],
         },
     },
