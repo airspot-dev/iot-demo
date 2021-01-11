@@ -25,17 +25,28 @@ template_annotations = {
 
 triggers = (
    {
+       "name": "%s-data-received" % name,
+       "filter": {
+           "attributes": {
+               "type": "data-received",
+               "phase": "running",
+               "subjecttype": "device",
+           }
+       }
+   },
+   {
        "name": name,
        "filter": {
            "attributes": {
                "type": "subject-property-changed",
                "phase": "running",
-               "subjecttype": "device"
+               "subjecttype": "device",
+               "propertyname": "tempc"
            }
        }
    },
 )
-triggers_default_broker="default"
+triggers_default_broker = "class-a"
 
 ksvc_sink = "broker:default"
 ksvc_procevents_sink = "broker:procevents"
