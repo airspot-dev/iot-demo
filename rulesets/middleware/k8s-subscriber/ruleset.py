@@ -47,10 +47,10 @@ rulesdata = [
                     lambda payload: (
                         # a specific subject is created to store reactive properties for frontend apps
                         payload.setdefault("_subject", subject_factory(
-                            f"ksvc:{payload['metadata']['labels']['demo.krules.airspot.dev/app']}:{payload['metadata']['name'].split('-dashboard')[0]}"
+                            f"ksvc:{payload['metadata']['labels']['krules.airspot.dev/type']}:{payload['metadata']['name'].split('-dashboard')[0]}"
                         )),
                         # this allows us to be more selective in defining the trigger
-                        payload["_subject"].set_ext("app", payload['metadata']['labels']['demo.krules.airspot.dev/app']),
+                        payload["_subject"].set_ext("app", payload['metadata']['labels']['krules.airspot.dev/type']),
                         # we set the url as reactive property so that can react when the service became available
                         # we do not use the subject cache to prevent multiple events
                         # as during the creation phase we could have update events in quick succession
@@ -73,7 +73,7 @@ rulesdata = [
                 Process(
                     lambda payload:
                         subject_factory(
-                            f"ksvc:{payload['metadata']['labels']['demo.krules.airspot.dev/app']}:{payload['metadata']['name']}"
+                            f"ksvc:{payload['metadata']['labels']['krules.airspot.dev/type']}:{payload['metadata']['name']}"
                         ).flush()
                 )
             ]
