@@ -14,6 +14,8 @@ processing = Const.PROCESSING
 from krules_core.providers import proc_events_rx_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
 
+from app_functions import DoPostApiCall
+
 # try:
 #     from ruleset_functions import *
 # except ImportError:
@@ -39,19 +41,29 @@ rulesdata = [
                 SubjectNameMatch("device:(?P<owner>.+):(?P<devicename>.+)", payload_dest="device_info")
             ],
             processing: [
-                Process(
-                    lambda self:
-                        requests.post(
-                            url="%s/device_manager/received_data/" % self.configs["django"]["restapi"]["url"],
-                            headers={"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
-                            json={
-                                "owner": self.payload["device_info"]["owner"],
-                                "device": self.payload["device_info"]["devicename"],
-                                "timestamp": self.payload["receivedAt"],
-                                "data": self.payload["data"],
-                            }
-                        )
-                )
+                DoPostApiCall(
+                    path="/device_manager/received_data/",
+                    json=lambda self: {
+                        "owner": self.payload["device_info"]["owner"],
+                        "device": self.payload["device_info"]["devicename"],
+                        "timestamp": self.payload["receivedAt"],
+                        "data": self.payload["data"],
+                    },
+                    raise_on_error=False
+                ),
+                # Process(
+                #     lambda self:
+                #         requests.post(
+                #             url="%s/device_manager/received_data/" % self.configs["django"]["restapi"]["url"],
+                #             headers={"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
+                #             json={
+                #                 "owner": self.payload["device_info"]["owner"],
+                #                 "device": self.payload["device_info"]["devicename"],
+                #                 "timestamp": self.payload["receivedAt"],
+                #                 "data": self.payload["data"],
+                #             }
+                #         )
+                # )
 
             ]
         }

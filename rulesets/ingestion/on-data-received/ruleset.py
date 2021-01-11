@@ -67,7 +67,8 @@ rulesdata = [
                             seconds=int(subject.rate))).isoformat(),
                     },
                     on_success=lambda self:
-                    lambda ret: self.subject.set("schedule_status_uid", ret.json()["uid"], muted=True)
+                    lambda ret: self.subject.set("schedule_status_uid", ret.json()["uid"], muted=True),
+                    raise_on_error=False
                 ),
             ]
         }

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: django
-        image: lorenzocampo/iot-demo-django@sha256:772ff8e4ea20adca788d176a4d086dd09df8d9c43323d3c37cb1eea9f94a558b
+        image: lorenzocampo/iot-demo-django@sha256:096f3d5079516bd6fefce92c013b0a9c91e57033690b79c4534605e5f2dec913
 
 ---
 

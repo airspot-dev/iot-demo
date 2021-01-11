@@ -13,6 +13,7 @@ class Fleet(models.Model):
         return self.name
 
     class Meta:
+        verbose_name = "fleet middleware"
         verbose_name_plural = "fleet middleware"
 
 
@@ -25,3 +26,20 @@ class ReceivedData(models.Model):
 
     class Meta:
         verbose_name_plural = "received data"
+
+
+class LocationTrackerService(models.Model):
+
+    maintenance = models.BooleanField(default=False)
+
+
+class LocationTrackerData(models.Model):
+
+    owner = models.CharField(max_length=255)
+    device = models.CharField(max_length=255)
+    coords = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    timestamp = models.DateTimeField()
+
+    class Meta:
+        verbose_name_plural = "location tracker data"
