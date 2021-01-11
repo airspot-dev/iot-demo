@@ -7,8 +7,8 @@ metadata:
 spec:
   template:
     metadata:
-#      annotations:
-#        autoscaling.knative.dev/minScale: "0"
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
       labels:
         krules.airspot.dev/type: django-admin
     spec:
