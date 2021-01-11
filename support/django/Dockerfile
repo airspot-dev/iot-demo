@@ -34,4 +34,4 @@ RUN python3 manage.py collectstatic
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", ":8080", "--workers", "1", "--threads", "8","mysite.wsgi"]
+CMD ["gunicorn", "--bind", ":8080", "--workers", "2", "--threads", "4","mysite.wsgi"]
