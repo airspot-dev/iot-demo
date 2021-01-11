@@ -30,6 +30,18 @@ proc_events_rx_factory().subscribe(
 rulesdata = [
 
     """
+    On data received we just set a "lastSeen" property allowing reacting for changing status
+    """,
+    {
+        rulename: "on-data-received-set-lastseen",
+        subscribe_to: "data-received",
+        ruledata: {
+            processing: [
+                SetSubjectProperty("lastSeen", lambda: datetime.now(timezone.utc).isoformat()),
+            ]
+        }
+    },
+    """
     When a subject property (except for status) changes, sets status to active
     """,
     {

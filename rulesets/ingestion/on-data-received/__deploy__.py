@@ -1,5 +1,5 @@
 
-name = "on-data-received-set-status"
+name = "on-data-received"
 
 add_files = (
     "ruleset.py",
@@ -27,15 +27,19 @@ template_annotations = {
 triggers = (
    {
        "name": name,
+       "broker": "data-received",
+   },
+   {
+       "name": f"{name}-prop-changes",
        "filter": {
            "attributes": {
                "type": "subject-property-changed",
-               "phase": "running",
+               "phase": "running",  # avoid onboarding props, becames running after first data are received
            }
        }
    },
    {
-       "name": "%s-inactive" % name,
+       "name": "%s-set-device-status" % name,
        "filter": {
            "attributes": {
                "type": "set-device-status",

@@ -20,11 +20,8 @@ processing = Const.PROCESSING
 
 
 proc_events_rx_factory().subscribe(
-  on_next=publish_proc_events_all,
+ on_next=publish_proc_events_errors,
 )
-# proc_events_rx_factory().subscribe(
-#  on_next=publish_proc_events_errors,
-# )
 
 rulesdata = [
     """
