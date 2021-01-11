@@ -30,7 +30,11 @@ class ReceivedData(models.Model):
 
 class LocationTrackerService(models.Model):
 
+    name = models.CharField(max_length=255)
     maintenance = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural = "location tracker service"
 
 
 class LocationTrackerData(models.Model):

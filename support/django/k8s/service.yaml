@@ -7,14 +7,14 @@ metadata:
 spec:
   template:
     metadata:
-#      annotations:
-#        autoscaling.knative.dev/minScale: "0"
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
       labels:
         krules.airspot.dev/type: django-admin
     spec:
       containers:
       - name: django
-        image: lorenzocampo/iot-demo-django@sha256:096f3d5079516bd6fefce92c013b0a9c91e57033690b79c4534605e5f2dec913
+        image: lorenzocampo/iot-demo-django@sha256:f5e879b62a6e06acbc1d886c303e3a8785584e9bb1354170e203a860f66fe506
 
 ---
 

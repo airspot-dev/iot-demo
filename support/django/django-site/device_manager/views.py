@@ -33,7 +33,7 @@ class StoreLocationTrackerData(APIView):
     def post(self, request):
 
         if LocationTrackerService.objects.count() == 0:
-            service = LocationTrackerService.objects.create()
+            service = LocationTrackerService.objects.create(name="Location Tracker")
         else:
             service = LocationTrackerService.objects.first()
 

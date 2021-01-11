@@ -19,7 +19,7 @@ labels = {
 }
 
 template_annotations = {
-    #"autoscaling.knative.dev/minScale": "0",
+    "autoscaling.knative.dev/minScale": "1",
 }
 
 #service_account = "my-service-account"

@@ -20,11 +20,17 @@ class ReceivedDataAdmin(admin.ModelAdmin):
         JSONField: {'widget': ReadOnlyJSONWidget()},
     }
 
+    def has_add_permission(self, request):
+        return False
+
 
 @admin.register(LocationTrackerService)
 class LocationTrackerServiceAdmin(admin.ModelAdmin):
-    list_display = ["id", "maintenance"]
+    list_display = ["name", "maintenance"]
     list_editable = ["maintenance"]
+
+    def has_add_permission(self, request):
+        return False
 
 
 @admin.register(LocationTrackerData)
@@ -33,3 +39,6 @@ class LocationTrackerServiceAdmin(admin.ModelAdmin):
     readonly_fields = ["owner", "device", "location", "coords", "timestamp"]
     search_fields = ["owner", "device"]
     list_filter = ["owner", "device"]
+
+    def has_add_permission(self, request):
+        return False
