@@ -36,10 +36,11 @@ rulesdata = [
             ],
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda subject: subject.get_ext("fleet"),
+                    channel=lambda payload: payload["_event_info"]["fleet"],
                     event=DEVICE_DATA,
                     data=lambda self:{
-                        "device_class": self.subject.get_ext("deviceclass"),
+                        "id": self.subject.name.split(":")[2], # subject name format device:<fleet>:<id>
+                        "device_class": self.payload["_event_info"]["deviceclass"],
                         "status": self.payload["value"],
                         "event": "Onboarded",
                         "event_class": WebsocketNotificationEventClass.CHEERING,

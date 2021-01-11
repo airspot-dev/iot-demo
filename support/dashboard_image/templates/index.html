@@ -61,7 +61,19 @@
 
     var channel = pusher.subscribe('%% fleet_channel %%');
     channel.bind('%% device_event %%', function(data) {
-      app.devices.push(data);
+      var to_add = true;
+      for(var idx in app.devices){
+        d = app.devices[idx];
+        if(d && d.id === data.id) {
+          to_add = false;
+          for(var k in data) {
+            d[k] = data[k]
+          }
+        }
+      }
+      if(to_add) {
+        app.devices.push(data);
+      }
     });
 
     // Vue application

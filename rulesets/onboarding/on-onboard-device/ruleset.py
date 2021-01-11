@@ -40,13 +40,10 @@ rulesdata = [
             processing: [
                 FlushSubject(),
                 SetSubjectProperties(lambda payload: payload["data"]),
-                SetSubjectExtendedProperty("deviceclass", lambda payload: payload["class"], cached=False),
-                SetSubjectExtendedProperty("fleet", lambda payload: payload["fleet"], cached=False),
-                SetSubjectExtendedProperty("subjecttype", "device", cached=False),
-                # We define the status property as both extended and reactive to make the definition of the triggers
-                # that can activate logic, e.g. device-status, more granular, depending on whether the device is running
-                # or onboarded, further increasing the resilience of the system
-                SetSubjectExtendedProperty("phase", "onboarded", cached=False),
+                SetSubjectExtendedProperty("deviceclass", lambda payload: payload["class"]),
+                SetSubjectExtendedProperty("fleet", lambda payload: payload["fleet"]),
+                SetSubjectExtendedProperty("subjecttype", "device"),
+                SetSubjectExtendedProperty("phase", "onboarded"),
                 SetSubjectProperty('status', 'READY')
             ]
         }

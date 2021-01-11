@@ -28,7 +28,7 @@ except ImportError:
     from .ruleset_functions import *
 
 ENDPOINT_IMAGE = 'lorenzocampo/device-endpoint@sha256:97f7aebd823771ebd47f5b3ea9cd4f4d2f43666fddfe0810d9fa00e68dbcbdc0'
-WS_APP_IMAGE = "lorenzocampo/dashboard-iot-demo@sha256:39ef6d38feaa53642c65ca83437aca78dcbc089cd27bf911bb84f473210d6513"
+WS_APP_IMAGE = "lorenzocampo/dashboard-iot-demo@sha256:2d718c3e9c7ab38006d1d68e1eebe82299bc2e18545f7c904766c535e67bfbd0"
 
 endpoint_rulesdata = [
     """
