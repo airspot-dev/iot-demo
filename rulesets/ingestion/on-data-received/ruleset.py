@@ -52,7 +52,7 @@ rulesdata = [
                 Filter(lambda payload: payload["property_name"] != "status")
             ],
             processing: [
-                SetSubjectProperty("status", "ACTIVE"),
+                SetSubjectProperty("status", "ACTIVE", use_cache=False),
                 DoPostApiCall(
                     path="/scheduler/scheduled_event/",
                     json=lambda subject: {
