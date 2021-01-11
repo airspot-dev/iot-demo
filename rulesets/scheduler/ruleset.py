@@ -52,9 +52,6 @@ rulesdata = [
                 ),
                 DoDeleteApiCall(
                     path=lambda payload: "/scheduler/scheduled_event/%s" % payload["uid"],
-                ),
-                Process(
-                    lambda payload: subject_factory(payload["subject"]).set("schedule_status_uid", None, muted=True)
                 )
             ]
         }
