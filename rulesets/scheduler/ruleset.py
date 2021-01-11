@@ -17,12 +17,12 @@ processing = Const.PROCESSING
 from krules_core.providers import proc_events_rx_factory, subject_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all, publish_proc_events_filtered
 
-proc_events_rx_factory().subscribe(
-    on_next=publish_proc_events_all,
-)
 # proc_events_rx_factory().subscribe(
-#     on_next=publish_proc_events_errors,
+#     on_next=publish_proc_events_all,
 # )
+proc_events_rx_factory().subscribe(
+    on_next=publish_proc_events_errors,
+)
 
 rulesdata = [
     """
