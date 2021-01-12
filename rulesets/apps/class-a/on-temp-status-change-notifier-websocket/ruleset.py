@@ -1,4 +1,4 @@
-from app_functions import WebsocketDevicePublishMessage, WebsocketNotificationEventClass
+from app_functions.pusherclient import WebsocketNotificationEventClass, WebsocketDevicePublishMessage
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 from krules_core.event_types import SUBJECT_PROPERTY_CHANGED

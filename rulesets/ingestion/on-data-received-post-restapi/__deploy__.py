@@ -1,5 +1,5 @@
 
-name = "on-data-received-post-restapi"
+name = "manage-device-status-post-restapi"
 
 add_files = (
     "ruleset.py",
@@ -26,7 +26,7 @@ template_annotations = {
 
 triggers = (
    {
-       "name": "on-data-received-post-restapi-trigger",
+       "name": "manage-device-status-post-restapi-trigger",
        "broker": "data-received",
        "filter": {
            "attributes": {

@@ -1,5 +1,5 @@
 
-name = "on-data-received-set-temp-status"
+name = "manage-device-status-set-temp-status"
 
 add_files = (
     "ruleset.py",

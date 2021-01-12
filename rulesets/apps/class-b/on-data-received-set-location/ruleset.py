@@ -28,7 +28,7 @@ rulesdata = [
     Always store coords in subject, Initialize starting point too if needed
     """,
     {
-        rulename: "on-data-received-store-coords",
+        rulename: "manage-device-status-store-coords",
         subscribe_to: "data-received",
         ruledata: {
             processing: [

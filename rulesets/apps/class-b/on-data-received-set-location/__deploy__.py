@@ -1,5 +1,5 @@
 
-name = "on-data-received-set-location"
+name = "manage-device-status-set-location"
 
 add_files = (
     "ruleset.py",

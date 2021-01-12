@@ -1,4 +1,4 @@
-from app_functions import DoDeleteApiCall
+from app_functions.restapiclient import DoDeleteApiCall
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 

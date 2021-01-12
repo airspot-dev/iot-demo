@@ -31,7 +31,7 @@ rulesdata = [
     Store temp property
     """,
     {
-        rulename: "on-data-received-store-temp",
+        rulename: "manage-device-status-store-temp",
         subscribe_to: "data-received",
         ruledata: {
             filters: [

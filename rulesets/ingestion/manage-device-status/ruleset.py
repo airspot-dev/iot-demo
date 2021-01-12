@@ -1,7 +1,7 @@
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 from datetime import datetime, timezone, timedelta
-from app_functions import DoPostApiCall
+from app_functions import *
 from uuid import uuid4
 
 # try:
@@ -27,13 +27,14 @@ proc_events_rx_factory().subscribe(
     on_next=publish_proc_events_errors,
 )
 
+
 rulesdata = [
 
     """
     On data received we just set a "lastSeen" property allowing reacting for changing status
     """,
     {
-        rulename: "on-data-received-set-lastseen",
+        rulename: "manage-device-status-set-lastseen",
         subscribe_to: "data-received",
         ruledata: {
             processing: [
@@ -53,22 +54,14 @@ rulesdata = [
             ],
             processing: [
                 SetSubjectProperty("status", "ACTIVE", use_cache=False),
-                DoPostApiCall(
-                    path="/scheduler/scheduled_event/",
-                    json=lambda subject: {
-                        "uid": str(getattr(subject, "schedule_status_uid", uuid4())),
-                        "event_type": "set-device-status",
-                        "subject": subject.name,
-                        "payload": {
-                            "value": "INACTIVE"
-                        },
-                        "origin_id": subject.event_info()["originid"],
-                        "when": (datetime.now(timezone.utc) + timedelta(
-                            seconds=int(subject.rate))).isoformat(),
+                Schedule(
+                    key="schedule_status_uid",
+                    event_type="request-device-status",
+                    payload={
+                        "value": "INACTIVE"
                     },
-                    on_success=lambda self:
-                    lambda ret: self.subject.set("schedule_status_uid", ret.json()["uid"], muted=True),
-                    raise_on_error=False
+                    when=lambda subject: (datetime.now(timezone.utc) + timedelta(
+                            seconds=int(subject.rate))),
                 ),
             ]
         }
@@ -78,8 +71,8 @@ rulesdata = [
     Set device status, used to set INACTIVE by the scheduler
     """,
     {
-        rulename: 'on-set-device-status',
-        subscribe_to: "set-device-status",
+        rulename: 'on-request-device-status',
+        subscribe_to: "request-device-status",
         ruledata: {
             processing: [
                 SetSubjectProperty("status", lambda payload: payload["value"])

@@ -8,9 +8,9 @@ add_files = (
 add_modules = True  # find modules in directory (folders having __init__.py file) and add them to container
 
 extra_commands = (
-    ("RUN", "apk add libffi-dev "),
-    ("RUN", "apk add openssl-dev"),
-    ("RUN", "pip3 install pusher==3.0.0"),
+    # ("RUN", "apk add libffi-dev "),
+    # ("RUN", "apk add openssl-dev"),
+    # ("RUN", "pip3 install pusher==3.0.0"),
 )
 
 labels = {

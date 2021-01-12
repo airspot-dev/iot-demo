@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from dateutil.parser import parse
 
-from app_functions import DoPostApiCall
+from app_functions.restapiclient import DoPostApiCall
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 

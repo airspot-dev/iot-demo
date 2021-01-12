@@ -1,5 +1,5 @@
 
-name = "on-data-received"
+name = "manage-device-status"
 
 add_files = (
     "ruleset.py",
@@ -39,10 +39,10 @@ triggers = (
        }
    },
    {
-       "name": "%s-set-device-status" % name,
+       "name": "%s-request-device-status" % name,
        "filter": {
            "attributes": {
-               "type": "set-device-status",
+               "type": "request-device-status",
            }
        },
    }

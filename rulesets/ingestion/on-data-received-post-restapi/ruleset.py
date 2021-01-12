@@ -14,7 +14,7 @@ processing = Const.PROCESSING
 from krules_core.providers import proc_events_rx_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
 
-from app_functions import DoPostApiCall
+from app_functions.restapiclient import DoPostApiCall
 
 # try:
 #     from ruleset_functions import *
@@ -34,7 +34,7 @@ rulesdata = [
     When receive a new device data post it to Rest API
     """,
     {
-        rulename: "on-data-received-post-restapi",
+        rulename: "manage-device-status-post-restapi",
         subscribe_to: ["data-received"],
         ruledata: {
             filters: [

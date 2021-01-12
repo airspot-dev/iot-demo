@@ -1,11 +1,10 @@
 from datetime import datetime, timezone, timedelta
-from app_functions import DoPostApiCall
 from krules_core import event_types
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 
 from krules_core.providers import proc_events_rx_factory
-from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
+from krules_env import publish_proc_events_all  #, publish_proc_events_filtered
 import os
 import jsonpath_rw_ext as jp
 

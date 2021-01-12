@@ -1,5 +1,5 @@
 import requests
-from app_functions import DoPatchApiCall
+from app_functions.restapiclient import DoPatchApiCall
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 from krules_core.event_types import SUBJECT_PROPERTY_CHANGED

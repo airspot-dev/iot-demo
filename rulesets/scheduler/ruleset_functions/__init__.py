@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from app_functions import DoGetApiCall
+from app_functions.restapiclient import DoGetApiCall
 import urllib
 
 

@@ -1,5 +1,4 @@
-
-from app_functions import DoPostApiCall
+from app_functions.restapiclient import DoPostApiCall
 
 
 class PostExtApi(DoPostApiCall):

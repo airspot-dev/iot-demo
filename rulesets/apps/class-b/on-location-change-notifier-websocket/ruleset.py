@@ -5,7 +5,7 @@ from krules_core import RuleConst as Const, event_types
 from krules_core.providers import proc_events_rx_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
 
-from app_functions import WebsocketDevicePublishMessage, WebsocketNotificationEventClass
+from app_functions.pusherclient import WebsocketNotificationEventClass, WebsocketDevicePublishMessage
 
 try:
     from ruleset_functions import *
