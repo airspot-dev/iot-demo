@@ -28,6 +28,9 @@ class DoRestApiCall(PyCall):
         if json is None:
             json = {}
 
+        if "raise_on_error" not in kwargs:
+            kwargs["raise_on_error"] = False
+
         super().execute(
             self._do_request,
             kwargs={

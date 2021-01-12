@@ -49,22 +49,7 @@ rulesdata = [
                         "timestamp": self.payload["receivedAt"],
                         "data": self.payload["data"],
                     },
-                    raise_on_error=False
                 ),
-                # Process(
-                #     lambda self:
-                #         requests.post(
-                #             url="%s/device_manager/received_data/" % self.configs["django"]["restapi"]["url"],
-                #             headers={"Authorization": "Token %s" % self.configs["django"]["restapi"]["api_key"]},
-                #             json={
-                #                 "owner": self.payload["device_info"]["owner"],
-                #                 "device": self.payload["device_info"]["devicename"],
-                #                 "timestamp": self.payload["receivedAt"],
-                #                 "data": self.payload["data"],
-                #             }
-                #         )
-                # )
-
             ]
         }
     },

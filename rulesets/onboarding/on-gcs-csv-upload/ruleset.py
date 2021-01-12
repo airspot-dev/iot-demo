@@ -39,10 +39,6 @@ rulesdata = [
         subscribe_to: "google.cloud.storage.object.v1.finalized",
         ruledata: {
             filters: [
-                Filter(
-                    lambda payload: 
-                        payload.get("contentType") == "text/csv"
-                ),
                 SubjectNameMatch(
                     "objects/(?P<fleetname>.+)/import/(?P<deviceclass>.+)/(?P<filename>.+)",
                     payload_dest="path_info"
@@ -55,11 +51,11 @@ rulesdata = [
                     path=lambda payload: payload["name"],
                     func=lambda device_data, self: (
                         self.router.route(
-                            "onboard-device",
-                            subject_factory(
+                            event_type="onboard-device",
+                            subject=subject_factory(
                                 "device:%s:%s" % (self.payload["path_info"]["fleetname"], device_data.pop("deviceid"))
                             ),
-                            {
+                            payload={
                                 "data": device_data,
                                 "class": self.payload["path_info"]["deviceclass"],
                                 "fleet": self.payload["path_info"]["fleetname"],
@@ -79,10 +75,7 @@ rulesdata = [
         subscribe_to: "on-gcs-csv-upload-errors",
         ruledata: {
             filters: [
-                Filter(
-                    lambda payload:
-                        payload["name"] == "on-csv-upload-import-devices"
-                )
+                PayloadMatchOne("$.name", "on-csv-upload-import-devices")
             ],
             processing: [
                 DeleteBlob(

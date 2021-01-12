@@ -1,3 +1,4 @@
+import pusher
 from krules_core.base_functions import RuleFunctionBase
 
 
@@ -11,7 +12,7 @@ class WebsocketNotificationEventClass(object):
 
 class WebsocketDevicePublishMessage(RuleFunctionBase):
 
-    def execute(self, channel, event, data):
+    def execute(self, data):
         pusher_client = pusher.Pusher(
             app_id=self.configs["pusher"]["credentials"]["app_id"],
             key=self.configs["pusher"]["credentials"]["key"],
@@ -19,5 +20,8 @@ class WebsocketDevicePublishMessage(RuleFunctionBase):
             cluster=self.configs["pusher"]["credentials"]["cluster"],
             ssl=True
         )
+
+        channel = self.subject.get_ext("fleet")
+        event = "device-data"
 
         pusher_client.trigger(channel, event, data)

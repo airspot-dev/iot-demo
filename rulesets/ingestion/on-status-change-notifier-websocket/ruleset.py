@@ -13,8 +13,6 @@ ruledata = Const.RULEDATA
 filters = Const.FILTERS
 processing = Const.PROCESSING
 
-DEVICE_DATA = "device-data"
-
 
 # proc_events_rx_factory().subscribe(
 #   on_next=publish_proc_events_all,
@@ -32,14 +30,12 @@ rulesdata = [
         subscribe_to: [SUBJECT_PROPERTY_CHANGED],
         ruledata: {
             filters: [
-                Filter(lambda payload: payload.get("value") == "ACTIVE")
+                OnSubjectPropertyChanged("status", "ACTIVE")
             ],
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda subject: subject.get_ext("fleet"),
-                    event=DEVICE_DATA,
-                    data=lambda self:{
-                        "id": self.subject.name.split(":")[2], # subject name format device:<fleet>:<id>
+                    lambda self: {
+                        "id": self.subject.name.split(":")[2],  # subject name format device:<fleet>:<id>
                         "status": self.payload["value"],
                         "event": "Receiving data",
                         "event_class": WebsocketNotificationEventClass.NORMAL,
@@ -56,13 +52,11 @@ rulesdata = [
         subscribe_to: [SUBJECT_PROPERTY_CHANGED],
         ruledata: {
             filters: [
-                Filter(lambda payload: payload.get("value") == "INACTIVE")
+                OnSubjectPropertyChanged("status", "INACTIVE")
             ],
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda subject: subject.get_ext("fleet"),
-                    event=DEVICE_DATA,
-                    data=lambda self:{
+                    lambda self: {
                         "id": self.subject.name.split(":")[2], # subject name format device:<fleet>:<id>
                         "status": self.payload["value"],
                         "event": "No more data receiving",

@@ -6,6 +6,8 @@ from krules_core.providers import proc_events_rx_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
 from krules_core.event_types import SUBJECT_PROPERTY_CHANGED
 
+from app_functions.slack import SendSlackMessage
+
 # try:
 #     from ruleset_functions import *
 # except ImportError:
@@ -27,6 +29,7 @@ proc_events_rx_factory().subscribe(
  on_next=publish_proc_events_errors,
 )
 
+
 rulesdata = [
     """
     Notify ACTIVE
@@ -39,18 +42,14 @@ rulesdata = [
                 Filter(lambda payload: payload.get("value") == "ACTIVE")
             ],
             processing: [
-                Process(
-                    lambda self:
-                        requests.post(
-                            url=self.configs["slack"]["webhooks"]["devices_channel"],
-                            json={
-                                "type": "mrkdwn",
-                                "text": ":white_check_mark: *{}* >> device *{}* is now *{}*".format(
-                                    self.subject.name.split(":")[1], self.subject.name.split(":")[2], self.payload.get("value")
-                                )
-                            }
-                        )
-                )
+                SendSlackMessage(
+                    channel="devices_channel",
+                    text=lambda self: ":white_check_mark: *{}* >> device *{}* is now *{}*".format(
+                        self.subject.name.split(":")[1],
+                        self.subject.name.split(":")[2],
+                        self.payload.get("value")
+                    )
+                ),
             ]
         }
     },
@@ -65,18 +64,14 @@ rulesdata = [
                 Filter(lambda payload: payload.get("value") == "INACTIVE")
             ],
             processing: [
-                Process(
-                    lambda self:
-                        requests.post(
-                            url=self.configs["slack"]["webhooks"]["devices_channel"],
-                            json={
-                                "type": "mrkdwn",
-                                "text": ":ballot_box_with_check: *{}* >> device *{}* becomes *{}*".format(
-                                    self.subject.name.split(":")[1], self.subject.name.split(":")[2], self.payload.get("value")
-                                )
-                            }
-                        )
-                )
+                SendSlackMessage(
+                    channel="devices_channel",
+                    text=lambda self: ":ballot_box_with_check: *{}* >> device *{}* becomes *{}*".format(
+                        self.subject.name.split(":")[1],
+                        self.subject.name.split(":")[2],
+                        self.payload.get("value")
+                    )
+                ),
             ]
         }
     },

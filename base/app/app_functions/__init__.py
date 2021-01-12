@@ -4,6 +4,7 @@ import hashlib
 from .restapiclient import *
 from .pusherclient import *
 from .scheduler import *
+from .slack import *
 
 
 def hashed(name, *args, length=10):
