@@ -41,9 +41,10 @@ rulesdata = [
                 FlushSubject(),
                 SetSubjectProperties(lambda payload: payload["data"]),
                 SetSubjectExtendedProperty("deviceclass", lambda payload: payload["class"]),
-                SetSubjectExtendedProperty("fleet", lambda payload: payload["fleet"]),
+                SetSubjectExtendedProperty("fleet", lambda payload: payload["fleet"], use_cache=False),
                 SetSubjectExtendedProperty("subjecttype", "device"),
                 SetSubjectExtendedProperty("phase", "onboarded"),
+                StoreSubject(),  # properties are immediateley available before reacting to status change
                 SetSubjectProperty('status', 'READY')
             ]
         }

@@ -6,7 +6,7 @@ from krules_core.providers import proc_events_rx_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
 from krules_core.event_types import SUBJECT_PROPERTY_CHANGED
 
-from app_functions.slack import SendSlackMessage
+from app_functions.slack import SlackMessage
 
 # try:
 #     from ruleset_functions import *
@@ -42,7 +42,7 @@ rulesdata = [
                 Filter(lambda payload: payload.get("value") == "ACTIVE")
             ],
             processing: [
-                SendSlackMessage(
+                SlackMessage(
                     channel="devices_channel",
                     text=lambda self: ":white_check_mark: *{}* >> device *{}* is now *{}*".format(
                         self.subject.name.split(":")[1],
@@ -64,7 +64,7 @@ rulesdata = [
                 Filter(lambda payload: payload.get("value") == "INACTIVE")
             ],
             processing: [
-                SendSlackMessage(
+                SlackMessage(
                     channel="devices_channel",
                     text=lambda self: ":ballot_box_with_check: *{}* >> device *{}* becomes *{}*".format(
                         self.subject.name.split(":")[1],

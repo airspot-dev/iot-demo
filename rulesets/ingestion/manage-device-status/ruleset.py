@@ -60,8 +60,8 @@ rulesdata = [
                     payload={
                         "value": "INACTIVE"
                     },
-                    when=lambda subject: (datetime.now(timezone.utc) + timedelta(
-                            seconds=int(subject.rate))),
+                    when=lambda subject: datetime.now(timezone.utc) + timedelta(
+                            seconds=int(subject.rate)),
                 ),
             ]
         }

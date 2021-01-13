@@ -27,7 +27,6 @@ proc_events_rx_factory().subscribe(
 # proc_events_rx_factory().subscribe(
 #  on_next=publish_proc_events_errors,
 # )
-
 rulesdata = [
     """
     Post url value to appropriate fleet model field
@@ -37,7 +36,7 @@ rulesdata = [
         subscribe_to: [SUBJECT_PROPERTY_CHANGED],
         ruledata: {
             filters: [
-                SubjectNameMatch("ksvc:(?P<app>.+):(?P<fleet>.+)")
+                SubjectNameMatch("ksvc:(?P<app>.+):(?P<fleet>.+)"),
             ],
             processing: [
                 DoPatchApiCall(
@@ -45,10 +44,10 @@ rulesdata = [
                     json=lambda payload: {
                              payload["subject_match"]["app"]: payload["value"],
                          },
-                    raise_on_error=True,
                 )
             ]
         }
     },
 ]
+
 

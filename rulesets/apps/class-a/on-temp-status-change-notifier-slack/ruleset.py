@@ -6,6 +6,8 @@ from krules_core import RuleConst as Const
 from krules_core.providers import proc_events_rx_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  # , publish_proc_events_filtered
 
+from app_functions import SlackMessage
+
 try:
     from ruleset_functions import *
 except ImportError:
@@ -34,16 +36,12 @@ rulesdata = [
         subscribe_to: "temp-status-back-to-normal",
         ruledata: {
             processing: [
-                Process(
-                    lambda self:
-                    requests.post(
-                        url=self.configs["slack"]["webhooks"]["devices_channel"],
-                        json={
-                            "type": "mrkdwn",
-                            "text": " :sunglasses:  device *{}* temp status back to normal! ".format(
-                                self.subject.name)
-                        }
-                    )
+                SlackMessage(
+                    channel="devices_channel",
+                    text=lambda subject: ":sunglasses: *{}* >> device *{}* temp status back to normal! ".format(
+                                subject.name.split(":")[1],
+                                subject.name.split(":")[2],
+                            )
                 ),
             ],
         },
@@ -57,17 +55,14 @@ rulesdata = [
         subscribe_to: "temp-status-bad",
         ruledata: {
             processing: [
-                Process(
-                    lambda self:
-                    requests.post(
-                        url=self.configs["slack"]["webhooks"]["devices_channel"],
-                        json={
-                            "type": "mrkdwn",
-                            "text": ":scream:  device *{}* is *{}* ({}°C)".format(
-                                self.subject.name, self.payload.get("status"), self.payload.get("tempc")
+                SlackMessage(
+                    channel="devices_channel",
+                    text=lambda self: ":scream: *{}* >> device *{}* is *{}* ({}°C)".format(
+                                self.subject.name.split(":")[1],
+                                self.subject.name.split(":")[2],
+                                self.payload.get("status"),
+                                self.payload.get("tempc")
                             )
-                        }
-                    )
                 ),
             ],
         },
@@ -81,19 +76,14 @@ rulesdata = [
         subscribe_to: "temp-status-still-bad",
         ruledata: {
             processing: [
-                Process(
-                    lambda self:
-                    requests.post(
-                        url=self.configs["slack"]["webhooks"]["devices_channel"],
-                        json={
-                            "type": "mrkdwn",
-                            "text": ":neutral_face: device *{}* is still *{}* from {} secs".format(
-                                self.subject.name,
+                SlackMessage(
+                    channel="devices_channel",
+                    text=lambda self: ":neutral_face: *{}* >> device *{}* is still *{}* from {} secs".format(
+                                self.subject.name.split(":")[1],
+                                self.subject.name.split(":")[2],
                                 self.payload.get("status"),
                                 self.payload.get("seconds")
                             )
-                        }
-                    )
                 ),
             ],
         },

@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from dateutil.parser import parse
 
+from app_functions import Schedule
 from app_functions.restapiclient import DoPostApiCall
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
@@ -68,21 +69,14 @@ rulesdata = [
                     "tempc": str(self.subject.get("tempc")),
                     "status": self.payload.get("value")
                 }, dispatch_policy=DispatchPolicyConst.DIRECT),
-                SetSubjectProperty("lastTempStatusChanged", lambda: datetime.now().isoformat(), muted=False),
-                DoPostApiCall(
-                    path="/scheduler/scheduled_event/",
-                    json=lambda self: {
-                        "uid": str(getattr(self.subject, "schedule_temp_status_uid", uuid4())),
-                        "event_type": "temp-status-recheck",
-                        "subject": self.subject.name,
-                        "payload": {
-                            "old_value": self.payload["value"]
-                        },
-                        "origin_id": self.subject.event_info()["originid"],
-                        "when": (datetime.now(timezone.utc) + timedelta(seconds=30)).isoformat(),
+                SetSubjectProperty("lastTempStatusChanged", lambda: datetime.now().isoformat(), muted=True),
+                Schedule(
+                    key="schedule_temp_status_uid",
+                    event_type="temp-status-recheck",
+                    payload=lambda payload: {
+                        "old_value": payload["value"]
                     },
-                    on_success=lambda self:
-                    lambda ret: self.subject.set("schedule_temp_status_uid", ret.json()["uid"], muted=True)
+                    when=lambda: datetime.now(timezone.utc) + timedelta(seconds=30)
                 ),
             ],
         },
@@ -103,20 +97,13 @@ rulesdata = [
                     "status": self.payload.get("old_value"),
                     "seconds": (datetime.now() - parse(self.subject.get("lastTempStatusChanged"))).seconds
                 }, dispatch_policy=DispatchPolicyConst.DIRECT),
-                DoPostApiCall(
-                    path="/scheduler/scheduled_event/",
-                    json=lambda self: {
-                        "uid": str(getattr(self.subject, "schedule_temp_status_uid", uuid4())),
-                        "event_type": "temp-status-recheck",
-                        "subject": self.subject.name,
-                        "payload": {
-                            "old_value": self.payload["old_value"]
-                        },
-                        "origin_id": self.subject.event_info()["originid"],
-                        "when": (datetime.now(timezone.utc) + timedelta(seconds=15)).isoformat(),
+                Schedule(
+                    key="schedule_temp_status_uid",
+                    event_type="temp-status-recheck",
+                    payload=lambda payload: {
+                        "old_value": payload["old_value"]
                     },
-                    on_success=lambda self:
-                    lambda ret: self.subject.set("schedule_temp_status_uid", ret.json()["uid"], muted=True)
+                    when=lambda: datetime.now(timezone.utc) + timedelta(seconds=15)
                 ),
             ],
         },

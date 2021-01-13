@@ -5,6 +5,8 @@ from krules_core import RuleConst as Const, event_types
 from krules_core.providers import proc_events_rx_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
 
+from app_functions.slack import SlackMessage
+
 try:
     from ruleset_functions import *
 except ImportError:
@@ -38,18 +40,11 @@ rulesdata = [
                 SubjectNameMatch("ksvc:(?P<app>.+):(?P<fleet>.+)"),
             ],
             processing: [
-                PrepareSlackMessage(),
-                Process(
-                    lambda payload:
-                        requests.post(
-                            url=payload['url'],
-                            json={
-                                "type": "mrkdwn",
-                                "text": payload["text"]
-                            }
-                        )
-                )
-
+                PrepareSlackTextMessage(payload_dest="text"),
+                SlackMessage(
+                    channel="middleware_channel",
+                    text=lambda payload: payload["text"]
+                ),
             ]
         }
     },

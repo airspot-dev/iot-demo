@@ -2,7 +2,7 @@ from krules_core.base_functions import RuleFunctionBase
 import requests
 
 
-class SendSlackMessage(RuleFunctionBase):
+class SlackMessage(RuleFunctionBase):
 
     def execute(self, channel, text):
         requests.post(

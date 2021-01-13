@@ -41,9 +41,7 @@ rulesdata = [
             ],
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda payload: payload["_event_info"]["fleet"],
-                    event="device-data",
-                    data=lambda self: {
+                    lambda self: {
                         "id": self.subject.name.split(":")[2],
                         "value": self.payload["value"]
                     }
@@ -65,9 +63,7 @@ rulesdata = [
             ],
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda payload: payload["_event_info"]["fleet"],
-                    event="device-data",
-                    data=lambda self: {
+                    lambda self: {
                         "id": self.subject.name.split(":")[2],
                         "event": self.payload["value"],
                         "event_class": WebsocketNotificationEventClass.CHEERING,
@@ -90,9 +86,7 @@ rulesdata = [
             ],
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda payload: payload["_event_info"]["fleet"],
-                    event="device-data",
-                    data=lambda self: {
+                    lambda self: {
                         "id": self.subject.name.split(":")[2],
                         "event": self.payload["value"],
                         "event_class": WebsocketNotificationEventClass.NORMAL,

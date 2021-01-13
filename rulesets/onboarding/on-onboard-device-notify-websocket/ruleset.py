@@ -13,9 +13,6 @@ ruledata = Const.RULEDATA
 filters = Const.FILTERS
 processing = Const.PROCESSING
 
-DEVICE_DATA = "device-data"
-
-
 # proc_events_rx_factory().subscribe(
 #   on_next=publish_proc_events_all,
 # )
@@ -36,10 +33,8 @@ rulesdata = [
             ],
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda payload: payload["_event_info"]["fleet"],
-                    event=DEVICE_DATA,
-                    data=lambda self:{
-                        "id": self.subject.name.split(":")[2], # subject name format device:<fleet>:<id>
+                    lambda self:{
+                        "id": self.subject.name.split(":")[2],  # subject name format device:<fleet>:<id>
                         "device_class": self.payload["_event_info"]["deviceclass"],
                         "status": self.payload["value"],
                         "event": "Onboarded",

@@ -1,11 +1,9 @@
 
 from krules_core.base_functions import *
 
-class PrepareSlackMessage(RuleFunctionBase):
+class PrepareSlackTextMessage(RuleFunctionBase):
 
-    def execute(self):
-
-        self.payload['url'] = self.configs["slack"]["webhooks"]["middleware_channel"]
+    def execute(self, payload_dest="text"):
 
         public = self.payload["value"].startswith("https")
         if public:
@@ -15,7 +13,7 @@ class PrepareSlackMessage(RuleFunctionBase):
                 self.payload["value"]
             )
         else:
-            self.payload["text"] = ":closed_lock_with_key: new *{}* available  *privately* for *{}* at {}".format(
+            self.payload[payload_dest] = ":closed_lock_with_key: new *{}* available  *privately* for *{}* at {}".format(
                                         self.payload["subject_match"]["app"],
                                         self.payload["subject_match"]["fleet"],
                                         self.payload["value"]

@@ -38,9 +38,7 @@ rulesdata = [
         ruledata: {
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda payload: payload["_event_info"]["fleet"],
-                    event=DEVICE_DATA,
-                    data=lambda self: {
+                    lambda self: {
                         "id": self.subject.name.split(":")[2],
                         "value": self.payload.get("value")
                     }
@@ -58,9 +56,7 @@ rulesdata = [
         ruledata: {
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda payload: payload["_event_info"]["fleet"],
-                    event=DEVICE_DATA,
-                    data=lambda subject: {
+                    lambda subject: {
                         "id": subject.name.split(":")[2],
                         "event": "Temp status back to normal! ",
                         "event_class": WebsocketNotificationEventClass.NORMAL,
@@ -79,9 +75,7 @@ rulesdata = [
         ruledata: {
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda payload: payload["_event_info"]["fleet"],
-                    event=DEVICE_DATA,
-                    data=lambda self: {
+                    lambda self: {
                         "id": self.subject.name.split(":")[2],
                         "event": "*{}* ({}°C)".format(
                             self.payload.get("status"), self.subject.get("tempc")
@@ -102,9 +96,7 @@ rulesdata = [
         ruledata: {
             processing: [
                 WebsocketDevicePublishMessage(
-                    channel=lambda payload: payload["_event_info"]["fleet"],
-                    event=DEVICE_DATA,
-                    data=lambda self: {
+                    lambda self: {
                         "id": self.subject.name.split(":")[2],
                         "event": "...still *{}* from {} secs".format(
                             self.payload.get("status"),

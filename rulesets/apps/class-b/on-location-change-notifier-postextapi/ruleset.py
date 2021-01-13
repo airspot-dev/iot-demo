@@ -8,6 +8,8 @@ from krules_env import publish_proc_events_all  #, publish_proc_events_filtered
 import os
 import jsonpath_rw_ext as jp
 
+from app_functions import Schedule
+
 try:
     from ruleset_functions import *
 except ImportError:
@@ -80,17 +82,11 @@ rulesdata = [
                        jp.match1("$.processing[*].exc_extra_info.response_code", payload) == 503)
             ],
             processing: [
-                DoPostApiCall(
-                    path="/scheduler/scheduled_event/",
-                    json=lambda self: {
-                        "event_type": "do-extapi-post",
-                        "subject": self.subject.name,
-                        "payload": self.payload["payload"],
-                        "origin_id": self.subject.event_info()["originid"],
-                        "when": (datetime.now(timezone.utc) + timedelta(seconds=10)).isoformat(),
-                    },
-                    raise_on_error=False
-                )
+                Schedule(
+                    event_type="do-extapi-post",
+                    payload=lambda payload: payload["payload"],
+                    when=lambda: datetime.now(timezone.utc) + timedelta(seconds=10)
+                ),
             ]
         }
     }

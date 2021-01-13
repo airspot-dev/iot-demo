@@ -10,8 +10,9 @@ ruledata = Const.RULEDATA
 filters = Const.FILTERS
 processing = Const.PROCESSING
 
-from krules_core.providers import proc_events_rx_factory
 from krules_env import RULE_PROC_EVENT
+
+from app_functions.slack import SlackMessage
 
 
 rulesdata = [
@@ -26,21 +27,14 @@ rulesdata = [
                 Filter(lambda payload: payload["got_errors"])
             ],
             processing: [
-                Process(
-                    lambda self:
-                        requests.post(
-                            url=self.configs["slack"]["webhooks"]["errors_channel"],
-                            json={
-                                "type": "mrkdwn",
-                                "text":
-                                    ":ambulance: *{}[{}]* \n```\n{}\n```".format(
+                SlackMessage(
+                    channel="errors_channel",
+                    text=lambda self: ":ambulance: *{}[{}]* \n```\n{}\n```".format(
                                         self.subject.event_info()["source"],
                                         self.payload["name"],
                                         "\n".join(jp.match1("$.processing[*].exc_info", self.payload))
                                     )
-                            }
-                        )
-                )
+                ),
             ]
         }
     },

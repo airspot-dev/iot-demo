@@ -6,6 +6,8 @@ from krules_core.providers import proc_events_rx_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
 from krules_core.event_types import SUBJECT_PROPERTY_CHANGED
 
+from app_functions.slack import SlackMessage
+
 # try:
 #     from ruleset_functions import *
 # except ImportError:
@@ -36,21 +38,15 @@ rulesdata = [
         subscribe_to: SUBJECT_PROPERTY_CHANGED,
         ruledata: {
             filters: [
-                Filter(lambda payload: payload.get("value") == "READY")
+                OnSubjectPropertyChanged("status", "READY"),
             ],
             processing: [
-                Process(
-                    lambda self:
-                        requests.post(
-                            url=self.configs["slack"]["webhooks"]["devices_channel"],
-                            json={
-                                "type": "mrkdwn",
-                                "text": ":+1: *{}* >> device *{}* on board! ".format(
-                                    self.subject.name.split(":")[1],
-                                    self.subject.name.split(":")[2],
+                SlackMessage(
+                    channel="devices_channel",
+                    text=lambda subject: ":+1: *{}* >> device *{}* on board! ".format(
+                                    subject.name.split(":")[1],
+                                    subject.name.split(":")[2],
                                 )
-                            }
-                        )
                 )
             ]
         }

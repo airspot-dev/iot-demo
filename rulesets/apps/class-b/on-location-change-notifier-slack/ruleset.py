@@ -5,6 +5,8 @@ from krules_core import RuleConst as Const, event_types
 from krules_core.providers import proc_events_rx_factory
 from krules_env import publish_proc_events_errors, publish_proc_events_all  #, publish_proc_events_filtered
 
+from app_functions.slack import SlackMessage
+
 try:
     from ruleset_functions import *
 except ImportError:
@@ -39,19 +41,13 @@ rulesdata = [
                 PayloadMatchOne("$.old_value", None)  # first time we get a location
             ],
             processing: [
-                Process(
-                    lambda self:
-                        requests.post(
-                            url=self.configs["slack"]["webhooks"]["devices_channel"],
-                            json={
-                                "type": "mrkdwn",
-                                "text": ":triangular_flag_on_post: *{}* >> device *{}* located in {}".format(
+                SlackMessage(
+                    channel="devices_channel",
+                    text=lambda self: ":triangular_flag_on_post: *{}* >> device *{}* located in {}".format(
                                     self.subject.name.split(":")[1],
                                     self.subject.name.split(":")[2],
                                     self.payload.get("value")
                                 )
-                            }
-                        )
                 ),
             ]
         }
@@ -68,19 +64,13 @@ rulesdata = [
                 PayloadMatchOne("$.old_value", lambda v: v is not None)
             ],
             processing: [
-                Process(
-                    lambda self:
-                        requests.post(
-                            url=self.configs["slack"]["webhooks"]["devices_channel"],
-                            json={
-                                "type": "mrkdwn",
-                                "text": ":rocket: *{}* >> device *{}* moved to {}".format(
+                SlackMessage(
+                    channel="device_channel",
+                    text=lambda self: ":rocket: *{}* >> device *{}* moved to {}".format(
                                     self.subject.name.split(":")[1],
                                     self.subject.name.split(":")[2],
                                     self.payload.get("value")
                                 )
-                            }
-                        )
                 ),
             ]
         }
