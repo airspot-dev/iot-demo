@@ -2,6 +2,7 @@
 from krules_core.base_functions import *
 from krules_core import RuleConst as Const
 import requests
+import uuid
 
 rulename = Const.RULENAME
 subscribe_to = Const.SUBSCRIBE_TO
@@ -44,8 +45,9 @@ rulesdata = [
                 SetSubjectExtendedProperty("fleet", lambda payload: payload["fleet"], use_cache=False),
                 SetSubjectExtendedProperty("subjecttype", "device"),
                 SetSubjectExtendedProperty("phase", "onboarded"),
+                SetSubjectProperty('schedule_status_uid', lambda: str(uuid.uuid4()), muted=True),
                 StoreSubject(),  # properties are immediateley available before reacting to status change
-                SetSubjectProperty('status', 'READY')
+                SetSubjectProperty('status', 'READY'),
             ]
         }
     },
