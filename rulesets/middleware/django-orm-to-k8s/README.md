@@ -1,6 +1,6 @@
 # django-orm-to-k8s
 
-responds to the events of creation / modification / deletion of the Fleet (middleware) model on the django orm,
+Responds to the events of creation / modification / deletion of the Fleet (middleware) model on the django orm,
 creating, modifying or destroying the revisions of the related knative services on kubernetes
 
 the connected services are an endpoint for the ingestion of data by the devices with its api_key secret
