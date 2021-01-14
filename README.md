@@ -1,40 +1,52 @@
 # IoT demo application
 
-The aim of this demo is to highlight some KRules core concepts such as the subjects' **reactive properties**, 
-which are used not just to map a digital twin of the devices and giving them a state to which changes we can 
-react. This may be expected in an IoT scenario. In the same way we react to devices produced metrics such 
-as a temperature sensor value, we also react to Kubernetes resources update events, gathering pieces of 
-information we are interested in and setting them as reactive properties of a _subject_ representing, in 
-that case, the twin of the resource.
-This is the case of a newly created Knative service for which we want to listen and react when a URL becomes 
-available or changes following the provisioning of the SSL cert. This is made very easily
+The aim of this demo is to highlight one KRules core concept: the subjects' reactive properties. 
+Reactive properties are used to map a data stream context (e.g. a digital twin of a device or a twin of a 
+Kubernetes resource) and to give them a state to which changes business logic can react. This behavior 
+is shown through this demo in an IoT scenario. In the demo the business logic reacts seamlessly to devices’ 
+produced metrics (e.g. temperature) and to Kubernetes resources update events. When it comes to Kubernetes 
+resources we gather pieces of information useful for application logic and we set them as reactive 
+properties. This case is exemplified in the demo through the scenario in which is created a new Knative 
+service for which we want to listen and react when a URL becomes available or changes following the 
+provisioning of the SSL cert. All this logic is developed very easily using KRules reactive properties.
 
 The Demo also wants to focus on how easy it is to take full advantage of Knative eventing, using brokers 
-and triggers and shape logic upon them using subjects **extended properties** so that any time we produced a 
-_CloudEvent_ related to a specific device (the subject) its metadata automatically contains those properties 
-determining the activation or not of o specific groups of rulesets
+and triggers and shape logic upon them using subjects extended properties. Any time a _CloudEvent_ related 
+to a specific device (the subject) is produced, its metadata automatically contains those properties 
+determining the activation or not of specific groups of rulesets (business logic).
 
-Demo starts form uploading a .csv file, containing the base information about a set of devices, on a 
-Google Cloud Storage bucket. 
-This is bound by a Knative CloudStorageSource, and a ruleset subscribe to the produced CloudEvents. 
-A device subject is created for each line of csv file and, depending in which folder the file was uploaded, 
-an _extended property_ is set defining an hypothetical "class of device" conditioning all subsequent events 
-related to the device allowing triggers to act differently.
-In particular, telemetry data are routed on a common broker but they are also split in two different brokers 
-specific for class of devices having as a result to activate a common set of logic for all devices 
-(eg: monitoring the _receiving data_ state) and specific logic for each class of device simply subscribing 
-to the appropriate broker.
-In particular, for one class we are interested in logic related to temperature sensor value and for the 
-other we are tracking geo positioning.
+Demo starts from uploading a .csv file, containing the base information about a set of devices, on a 
+Google Cloud Storage bucket. This bucket is bound by a Knative CloudStorageSource, and a ruleset subscribes 
+to the produced CloudEvents. A device’s subject is created for each line of the csv file. Depending on which 
+folder the file was uploaded, an _extended property_ is set defining an hypothetical "device class". 
+The device class conditions all subsequent events related to the device allowing triggers to act differently. 
+In the demo telemetry data are routed on a common broker but they are also split in two different brokers, 
+each specific for each device class. This architecture allows the activation of a common business logic 
+for all devices (eg: monitoring the _receiving data_ state) and the activation of a specific business logic 
+for each device class. This result is achieved quite simply by subscribing to the appropriate broker. 
+In the demo we have specific business logic related to temperature for the first device class and specific 
+business logic related to geo positioning for the second device class.
 
-For ingestion we simply use an http endpoint provided by a serverless Knative service.
-The service (and its related secret containing the api key) is initially created starting from a 
-database model created in a simple Django application for which an ad-hoc extension produces cloudevents 
-for any create/update/delete operation on Django ORM for models we are interested in. Each update 
-operation originates a new Knative service revision. This, in fact, make the Django application 
-acting as another Knative source.
+For the data ingestion we will simply use an http endpoint provided by a serverless Knative service. 
+The Knative service (and its related secret containing the api key) is created from a database model. 
+The database model is generated in a simple Django application. An ad-hoc extension was developed. 
+This extension produces cloudevents for any create/update/delete operation on Django ORM for the models 
+we are interested in. Each update operation originates a new Knative service revision. 
+This behavior makes the Django application acting as another Knative source.
+
+Another aspect the demo focuses on is the **observability** of rules activity. 
+This characteristic can help developers in writing applications but it can also be used as part of the 
+application itself. When an event is processed by a rule another event is generated: the event 
+“rule X has processed event Y”. This new event gathers all execution runtime information, including errors. 
+These events are all routed on their own broker which of course can be subscribed in order to build new logic. 
+All of this can be particularly useful for general or specific **error management**. 
+In fact the services producing errors and the ones specialized to manage errors will be totally decoupled, 
+agnostic and independent. Such a characteristic can be a great advantage in a distributed and asynchronous 
+application, the typical nature of a microservices architecture that takes full advantage of event driven 
+paradigm.
 
 For more detailed information about how the demo works you can take a look to [these slides](https://github.com/airspot-dev/iot-demo/blob/master/Diagrams.pdf)
 
-Note that a step-by-step installation guide nor an illustrating video for this demo don't exist yet, but, if you are interested 
-in knowing more about the project or even contribute to it don't esitate to [contact us](mailto:info@airspot.tech)
+Note that neither a step-by-step installation guide nor an illustrating video for this demo exist yet, but, 
+if you are interested in knowing more about the project or even contribute to it, don't hesitate 
+to [contact us](mailto:info@airspot.tech)
