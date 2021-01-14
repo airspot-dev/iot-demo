@@ -14,5 +14,6 @@ class PostExtApi(DoPostApiCall):
                 "coords": kwargs.pop("coords"),
                 "timestamp": kwargs.pop("timestamp"),
             },
+            raise_on_error=True,
             **kwargs
         )
