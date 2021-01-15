@@ -1,6 +1,6 @@
 # IoT demo application
 
-The aim of this demo is to highlight some KRules core concept: the **subject** and its **reactive properties**. 
+The aim of this demo is to highlight some KRules core concept like the **subject** and its **reactive properties**. 
 Reactive properties are used to map a data stream context (e.g. a digital twin of a device or a twin of a 
 Kubernetes resource) and to give them a state to which changes business logic can react. This behavior 
 is shown through this demo in an IoT scenario. In the demo the business logic reacts seamlessly to devices’ 
