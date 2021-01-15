@@ -1,6 +1,6 @@
 # IoT demo application
 
-The aim of this demo is to highlight one KRules core concept: the subjects' reactive properties. 
+The aim of this demo is to highlight some KRules core concept: the **subject** and its **reactive properties**. 
 Reactive properties are used to map a data stream context (e.g. a digital twin of a device or a twin of a 
 Kubernetes resource) and to give them a state to which changes business logic can react. This behavior 
 is shown through this demo in an IoT scenario. In the demo the business logic reacts seamlessly to devices’ 
@@ -18,7 +18,7 @@ determining the activation or not of specific groups of rulesets (business logic
 Demo starts from uploading a .csv file, containing the base information about a set of devices, on a 
 Google Cloud Storage bucket. This bucket is bound by a Knative CloudStorageSource, and a ruleset subscribes 
 to the produced CloudEvents. A device’s subject is created for each line of the csv file. Depending on which 
-folder the file was uploaded, an _extended property_ is set defining an hypothetical "device class". 
+folder the file was uploaded, an **extended property** is set defining an hypothetical "device class". 
 The device class conditions all subsequent events related to the device allowing triggers to act differently. 
 In the demo telemetry data are routed on a common broker but they are also split in two different brokers, 
 each specific for each device class. This architecture allows the activation of a common business logic 
