@@ -15,7 +15,7 @@ spec:
     database_username: $DATABASE_USERNAME
     databse_engine: "postgresql"
     allowed_hosts:
-      - "django.iot-demo.gke1.airspot.dev"
+      - "django.iot-demo.gke2.airspot.dev"
     installed_apps:
       - 'django.contrib.admin'
       - 'django.contrib.auth'

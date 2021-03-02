@@ -43,7 +43,7 @@ class SetClusterLocalLabel(SetPayloadProperty):
 
         super().execute(
             payload_target, self.payload.get("data").get("cluster_local") and {
-                        "serving.knative.dev/visibility": "cluster-local"
+                        "networking.knative.dev/visibility": "cluster-local",
                 } or {}
         )
 
@@ -76,8 +76,8 @@ class UpdateEndpointService(K8sObjectsQuery):
 
     def _update_obj(self, obj, secret_name, lbl_cluster_local):
         obj.obj["spec"]["template"]["metadata"]["name"] = secret_name
-        if "serving.knative.dev/visibility" in obj.obj["metadata"]["labels"]:
-            del obj.obj["metadata"]["labels"]["serving.knative.dev/visibility"]
+        if "networking.knative.dev/visibility" in obj.obj["metadata"]["labels"]:
+            del obj.obj["metadata"]["labels"]["networking.knative.dev/visibility"]
         obj.obj["metadata"]["labels"].update(lbl_cluster_local)
         for container in obj.obj["spec"]["template"]["spec"]["containers"]:
             if container["name"] == "user-container":
@@ -107,8 +107,8 @@ class UpdateEndpointService(K8sObjectsQuery):
 class UpdateDashboardService(K8sObjectsQuery):
 
     def _update_obj(self, obj, lbl_cluster_local):
-        if "serving.knative.dev/visibility" in obj.obj["metadata"]["labels"]:
-            del obj.obj["metadata"]["labels"]["serving.knative.dev/visibility"]
+        if "networking.knative.dev/visibility" in obj.obj["metadata"]["labels"]:
+            del obj.obj["metadata"]["labels"]["networking.knative.dev/visibility"]
         obj.obj["metadata"]["labels"].update(lbl_cluster_local)
 
         self.payload["_updated_object"] = obj.obj

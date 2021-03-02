@@ -13,7 +13,7 @@ extra_commands = (
 )
 
 labels = {
-    "serving.knative.dev/visibility": "cluster-local",
+    "networking.knative.dev/visibility": "cluster-local",
     "krules.airspot.dev/type": "ruleset",
     "krules.airspot.dev/ruleset": name,
     "configs.krules.airspot.dev/google-cloud": "inject"

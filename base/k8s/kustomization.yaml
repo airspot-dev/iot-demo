@@ -4,6 +4,7 @@ resources:
 - config-google-cloud-credentials.yaml
 - config-krules-django-restapi.yaml
 - config-krules-slack-webhooks.yaml
+- config-pusher-credentials.yaml
 - serviceaccount.yaml
 - brokers.yaml
 
