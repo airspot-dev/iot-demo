@@ -65,7 +65,7 @@ rulesdata = [
             ],
             processing: [
                 SlackMessage(
-                    channel="device_channel",
+                    channel="devices_channel",
                     text=lambda self: ":rocket: *{}* >> device *{}* moved to {}".format(
                                     self.subject.name.split(":")[1],
                                     self.subject.name.split(":")[2],
